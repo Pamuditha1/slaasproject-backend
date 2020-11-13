@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "pamuditharajapaksha@gmail.com",
   "license": "ISC",
@@ -14,11 +14,15 @@
     "body-parser": "^1.19.0",
     "config": "^3.3.2",
     "express": "^4.17.1",
+    "generate-unique-id": "^2.0.1",
     "joi": "^17.2.1",
     "joi-objectid": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "mongoose": "^5.10.9",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
   }
 }

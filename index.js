@@ -22,7 +22,7 @@ app.use(function(req,res,next) {
 });
 app.use(express.json());
 app.use('/slaas/api/registeruser', users);
-app.use('/slaas/api/registermember', members);
+app.use('/slaas/api/user/register-member', members);
 app.use('/slaas/api/auth', auth);
 
 var connection = mysql.createConnection({
