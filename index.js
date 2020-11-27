@@ -7,6 +7,8 @@ const mysql = require('mysql');
 const auth = require('./routes/authRoute');
 const users = require('./routes/userRoute');
 const members = require('./routes/memberRoute');
+const uploadMembers = require('./routes/csvUploadRoute');
+const userLogin = require('./routes/userLogin')
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -21,8 +23,11 @@ app.use(function(req,res,next) {
     next();
 });
 app.use(express.json());
-app.use('/slaas/api/registeruser', users);
+app.use('/slaas/api/register-user', users);
 app.use('/slaas/api/user/register-member', members);
+app.use('/slaas/api/user/upload-members', uploadMembers);
+app.use('/slaas/api/user/login', userLogin);
+app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
 
 var connection = mysql.createConnection({

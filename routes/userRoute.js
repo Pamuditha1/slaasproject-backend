@@ -29,8 +29,8 @@ router.post('/', async (req, res) => {
     //Check whether the user available
     connection.query(`SELECT email FROM users WHERE email='${req.body.email}'`, async function (error, results, fields) {
         if (error) throw error;
-         let i=0;
-         let alreadyReg = false;
+        let i=0;
+        let alreadyReg = false;
         for(i=0; i<results.length; i++) {
             if(req.body.email == results[i].email) {
                 alreadyReg = true;
@@ -58,7 +58,6 @@ router.post('/', async (req, res) => {
 function validateUser(user) {
     const schema = Joi.object({
         userName: Joi.string().min(5).max(50).required(),
-        officeID: Joi.string().min(5).max(255),
         email: Joi.string().min(5).max(255).required().email(),
         password: Joi.string().min(5).max(255).required(),
         accountType: Joi.string().min(3).max(255).required()
