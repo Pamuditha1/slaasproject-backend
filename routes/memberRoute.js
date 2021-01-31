@@ -111,7 +111,8 @@ function addOfficial(res,id,officialData) {
         // (!error) ? res.status(200).send("Successfully Added Member " + memberFirstName) : res.status(404).send(error);
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            deleteRow('member_personal', "personalID", id);
             return 
         }
         addProfessional(res,id,professionalData)
@@ -130,8 +131,10 @@ function addProfessional(res,id,professionalData) {
 
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
             return 
         }
         addAcademic(id,res,professionalData)
@@ -154,9 +157,12 @@ function addAcademic(id,res,professionalData) {
                     academicData[i], (error, results, fields) => {
                     if(error) {
                         res.status(404).send(error);
-                        connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-                        connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-                        connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+                        // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+                        // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+                        // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+                        deleteRow('member_personal', 'personalID', id);
+                        deleteRow('member_official', 'officialID', id);
+                        deleteRow('member_professional', 'professionalID', id);
                         return 
                     }                    
                     
@@ -178,10 +184,14 @@ function addProposer(res,id,membershipData) {
 
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
+            deleteRow('member_academic', 'professionalID', id);
+            deleteRow('member_professional', 'professionalID', id);
             return 
         }
         addSeconder(res,id,membershipData)
@@ -199,11 +209,16 @@ function addSeconder(res,id,membershipData) {
 
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
+            deleteRow('member_academic', 'professionalID', id);
+            deleteRow('member_professional', 'professionalID', id);
+            deleteRow('proposers', 'proposerID', id);
             return 
         }
         addMembership(res,id,membershipData)
@@ -221,12 +236,18 @@ function addMembership(res,id,membershipData) {
 
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+            // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
+            deleteRow('member_academic', 'professionalID', id);
+            deleteRow('member_professional', 'professionalID', id);
+            deleteRow('proposers', 'proposerID', id);
+            deleteRow('seconders', 'seconderID', id);
             return 
         }
         addPayment(res,id)
@@ -235,6 +256,7 @@ function addMembership(res,id,membershipData) {
 }
 
 function addPayment(res,id) {
+    if(membershipData.status === 'member') {
     const payment = [id, paymentData.paymentDoneDate, paymentData.receivedData , paymentData.paymentMethod , 
         paymentData.amount , paymentData.bank , paymentData.branch, paymentData.accountNo, paymentData.description,id] ;
 
@@ -244,17 +266,107 @@ function addPayment(res,id) {
 
         if(error) {
             res.status(404).send(error);
-            connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_membership WHERE membershipID='${id}'`);
+            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+            // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
+            deleteRow('member_academic', 'professionalID', id);
+            deleteRow('member_professional', 'professionalID', id);
+            deleteRow('member_membership', 'membershipID', id);
+            deleteRow('proposers', 'proposerID', id);
+            deleteRow('seconders', 'seconderID', id);
+            return 
+        }   
+        addMember(res,id)
+    });
+    }
+    else {
+        connection.query(`INSERT INTO payments (paymentID) VALUES ('${id}') ` , (error, results, fields) => {
+    
+            if(error) {
+                res.status(404).send(error);
+                // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+                // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+                // connection.query(`DELETE FROM member_membership WHERE membershipID='${id}'`);
+                // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+                // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+                // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+                // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+                deleteRow('member_personal', 'personalID', id);
+                deleteRow('member_official', 'officialID', id);
+                deleteRow('member_academic', 'professionalID', id);
+                deleteRow('member_professional', 'professionalID', id);
+                deleteRow('member_membership', 'membershipID', id);
+                deleteRow('proposers', 'proposerID', id);
+                deleteRow('seconders', 'seconderID', id);
+                return 
+            }   
+            addMember(res,id)
+        });
+    }
+}
+
+function addMember(res,id) {
+    let enroll ;
+    let applied ;
+    if(membershipData.enrollDate) {
+        enroll = new Date();
+    }
+    else if(membershipData.appliedDate){
+        applied = new Date();
+    }
+    const member = [id, membershipData.status, enroll , applied , '' , '' , '', '', id, id, id, id, id] ;
+
+    connection.query(`INSERT INTO members (memberID, status, enrollDate, appliedDate, councilPosition, memberFolioNo, membershipNo,\
+        memPaidLast, personalID, officialID, professionalID, paymentID, membershipID)\
+    VALUES (?,?,?,?,?,?,?,?, (SELECT personalID FROM member_personal WHERE personalID='${id}'), 
+    (SELECT officialID FROM member_official WHERE officialID='${id}'), 
+    (SELECT professionalID FROM member_professional WHERE professionalID='${id}'), 
+    (SELECT paymentID FROM payments WHERE paymentID='${id}'),
+    (SELECT membershipID FROM member_membership WHERE membershipID='${id}'))` , 
+    
+    
+    member, (error, results, fields) => {
+
+        if(error) {
+            res.status(404).send(error);
+            // connection.query(`DELETE FROM payments WHERE paymentID='${id}'`);
+            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+            // connection.query(`DELETE FROM member_membership WHERE membershipID='${id}'`);
+            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+            // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+            deleteRow('payments', 'paymentID', id);
+            deleteRow('member_personal', 'personalID', id);
+            deleteRow('member_official', 'officialID', id);
+            deleteRow('member_academic', 'professionalID', id);
+            deleteRow('member_professional', 'professionalID', id);
+            deleteRow('member_membership', 'membershipID', id);
+            deleteRow('proposers', 'proposerID', id);
+            deleteRow('seconders', 'seconderID', id);
             return 
         }   
         res.status(200).send("Successfully Added Member " + memberFirstName)
     });
 }
+
+
+
+function deleteRow(table, key, id) {
+
+    connection.query(`DELETE FROM ${table} WHERE ${key}='${id}'`, (error) => {
+        if(error) console.log(error)
+    })
+    
+}
+
 
 // function validateMember(member) {
 //     const schema = Joi.object({
