@@ -2,6 +2,7 @@ const config = require('config');
 const express = require('express');
 const app = express();
 const mysql = require('mysql');
+const cors = require('cors')
 
 const auth = require('./routes/authRoute');
 const users = require('./routes/userRoute');
@@ -9,6 +10,7 @@ const members = require('./routes/memberRoute');
 const uploadMembers = require('./routes/csvUploadRoute');
 const viewMembers = require('./routes/viewMemberRoute');
 const userLogin = require('./routes/userLogin');
+const searchMember = require('./routes/searchMembersRoute')
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -16,17 +18,19 @@ const userLogin = require('./routes/userLogin');
 //     process.exit(1);
 // }
 
-app.use(function(req,res,next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", 'PUT, POST, GET, DELETE, OPTIONS');
-    next();
-});
+// app.use(function(req,res,next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     res.header("Access-Control-Allow-Methods", 'PUT, POST, GET, DELETE, OPTIONS');
+//     next();
+// });
+app.use(cors())
 app.use(express.json());
 app.use('/slaas/api/register-user', users);
 app.use('/slaas/api/user/register-member', members);
 app.use('/slaas/api/user/upload-members', uploadMembers);
 app.use('/slaas/api/user/view/members', viewMembers);
+app.use('/slaas/api/user/search', searchMember);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
@@ -52,9 +56,9 @@ app.get('/slaas/api/',(req,res) => {
         // console.log('The solution is: ', results[0].userName);
         //  const re = Object.assign({}, results);
         //  console.log(re.0);
-         const name = "Jayod";
+        const name = "Jayod";
 
-         let i=0;
+        let i=0;
         for(i=0; i<results.length; i++) {
             if(name == results[i].userName) {
                 res.send(results[i].email);
