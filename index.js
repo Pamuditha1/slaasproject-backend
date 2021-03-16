@@ -9,6 +9,7 @@ const users = require('./routes/userRoute');
 const members = require('./routes/memberRoute');
 const uploadMembers = require('./routes/csvUploadRoute');
 const viewMembers = require('./routes/viewMemberRoute');
+const viewAllMembers = require('./routes/allMembersRoute')
 const userLogin = require('./routes/userLogin');
 const searchMember = require('./routes/searchMembersRoute')
 
@@ -30,6 +31,7 @@ app.use('/slaas/api/register-user', users);
 app.use('/slaas/api/user/register-member', members);
 app.use('/slaas/api/user/upload-members', uploadMembers);
 app.use('/slaas/api/user/view/members', viewMembers);
+// app.use('/slaas/api/user/view/members/all', viewAllMembers);
 app.use('/slaas/api/user/search', searchMember);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
@@ -72,6 +74,6 @@ app.get('/slaas/api/',(req,res) => {
 });
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`Listening on port ${port} ...`));
 
