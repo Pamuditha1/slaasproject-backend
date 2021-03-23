@@ -18,12 +18,21 @@ connection.connect((err) => {
 
 router.get('/all', async (req, res) => {
 
-    connection.query(`SELECT title, nameWinitials, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
+    // connection.query(`SELECT title, nameWinitials, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
+    // councilPosition, memberFolioNo, membershipNo, designation, department, placeOfWork, offMobile, offLand, offFax, offEmail, offAddrs, profession, 
+    // specialization1, specialization2, specialization3, specialization4, specialization5, degree, university
+    // FROM member_personal , member_membership, members, member_official, member_professional, member_academic WHERE member_official.officialID = member_personal.personalID 
+    // AND member_personal.personalID = member_membership.membershipID AND members.memberID = member_personal.personalID
+    // AND member_personal.personalID = member_professional.professionalID AND member_academic.professionalID = member_professional.professionalID;`
+    connection.query(`SELECT 
+    title, nameWinitials, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
     councilPosition, memberFolioNo, membershipNo, designation, department, placeOfWork, offMobile, offLand, offFax, offEmail, offAddrs, profession, 
     specialization1, specialization2, specialization3, specialization4, specialization5, degree, university
-    FROM member_personal , member_membership, members, member_official, member_professional, member_academic WHERE member_official.officialID = member_personal.personalID 
-    AND member_personal.personalID = member_membership.membershipID AND members.memberID = member_personal.personalID
-    AND member_personal.personalID = member_professional.professionalID AND member_academic.professionalID = member_professional.professionalID;`
+    FROM 
+    members , member_academic 
+    WHERE 
+    members.memberID = member_academic.memberID;`
+
     , async function (error, results, fields) {
         if (error) throw error;
         

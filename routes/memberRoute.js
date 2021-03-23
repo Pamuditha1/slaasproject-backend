@@ -30,11 +30,8 @@ let memberFirstName = '';
 // });
 let id = '';
 
-let personalData = '';
-let officialData = '';
-let professionalData = '';
-let membershipData = '';
-let paymentData = '';
+let member = '';
+// let paymentData = '';
 
 router.post('/', async (req, res) => {
 
@@ -42,22 +39,23 @@ router.post('/', async (req, res) => {
     // if (error) return res.status(400).send(error.details[0].message);
 
     //Check whether the member available
-    
-    personalData = req.body.personalData;
-    officialData = req.body.officialData;
-    professionalData = req.body.professionalData;
-    membershipData = req.body.membershipData;
-    paymentData = req.body.paymentData;
+    console.log(req.body)
+    member = req.body;
+    console.log(member.academic.length)
+    // officialData = req.body.officialData;
+    // professionalData = req.body.professionalData;
+    // membershipData = req.body.membershipData;
+    // paymentData = req.body.paymentData;
 
     id = uuidv1();
 
-    connection.query(`SELECT email FROM member_personal WHERE email='${personalData.email}'`, async function (error, results, fields) {
+    connection.query(`SELECT email FROM member_personal WHERE email='${member.email}'`, async function (error, results, fields) {
         let databaseError;
         if (error) throw error;
-        // let i=0;
-        // let alreadyReg = false;
+        let i=0;
+        let alreadyReg = false;
         // for(i=0; i<results.length; i++) {
-        //     if(personalData.email == results[i].email) {
+        //     if(member.email == results[i].email) {
         //         alreadyReg = true;
         //         break;
         //     }            
@@ -67,117 +65,15 @@ router.post('/', async (req, res) => {
         //     res.status(400).send('Member already Registered.');
         //     return;
         // } 
-        else addPersonal(personalData,res,id,officialData)
-        console.log(id);
+        // else 
+        addProposer(res,id,member)
+        
     });   
 });
 
-function addPersonal(personalData,res,id,officialData) {
-    const resAddrs = `${personalData.resAddOne}, ${personalData.resAddTwo }, ${personalData.resAddThree}, ${personalData.resAddFour}, 
-    ${personalData.resAddFive}` ;
-    const perAddrs =   `${personalData.perAddOne}, ${personalData.perAddTwo} , ${personalData.perAddThree}, ${personalData.perAddFour}, 
-    ${personalData.perAddFive}`;
-
-    const personal = [id, personalData.title, personalData.nameWinitials, personalData.nameInFull, personalData.firstName, personalData.lastName, 
-    personalData.gender, personalData.dob, personalData.nic,  personalData.mobileNo, personalData.landNo, personalData.email, resAddrs, perAddrs];
-        
-    memberFirstName = personal[4]
-
-    connection.query(`INSERT INTO member_personal (personalID, title, nameWinitials, fullName, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs)\
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)` , personal, (error, results, fields) => {
-        // (error) ? res.status(404).send(error) : addResAddress()
-            if(error) {
-                res.status(404).send(error);
-                return 
-            }
-            addOfficial(res,id,officialData)
-        // console.log(id)
-            
-    });
-    
-};
-
-function addOfficial(res,id,officialData) {
-    const offAddrs =  `${officialData.offAddrslineOne}, ${officialData.offAddrslineTwo}, ${officialData.offAddrslineThree}, 
-    ${officialData.offAddrslineFour}, ${officialData.offAddrslineFive}`;
-
-    const official = [id, officialData.designation, officialData.division , officialData.placeWork, officialData.offMobile, 
-    officialData.offLandNo, officialData.offFax, officialData.offEmail, offAddrs];
-
-    connection.query(`INSERT INTO member_official (officialID, designation,department,placeOfWork,offMobile,offLand,\
-        offFax,offEmail,offAddrs)\
-    VALUES (?,?,?,?,?,?,?,?,?)` , official, (error, results, fields) => {
-        
-        // (!error) ? res.status(200).send("Successfully Added Member " + memberFirstName) : res.status(404).send(error);
-        if(error) {
-            res.status(404).send(error);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            deleteRow('member_personal', "personalID", id);
-            return 
-        }
-        addProfessional(res,id,professionalData)
-            
-        // if(error) databaseError = error;
-    
-    });
-}
-function addProfessional(res,id,professionalData) {
-    const professional = [id, professionalData.profession, professionalData.fieldOfSpecial[0] , professionalData.fieldOfSpecial[1] , 
-    professionalData.fieldOfSpecial[2] , professionalData.fieldOfSpecial[3] , professionalData.fieldOfSpecial[4]];
-
-    connection.query(`INSERT INTO member_professional (professionalID, profession,specialization1,specialization2,specialization3,specialization4,\
-        specialization5)\
-    VALUES (?,?,?,?,?,?,?)` , professional, (error, results, fields) => {
-
-        if(error) {
-            res.status(404).send(error);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            deleteRow('member_personal', 'personalID', id);
-            deleteRow('member_official', 'officialID', id);
-            return 
-        }
-        addAcademic(id,res,professionalData)
-
-    });
-}
-
-function addAcademic(id,res,professionalData) {
-    
-    let academicData = [];
-    var i;
-    for(i=0; i<professionalData.academic.length; i++) 
-    {
-            
-                academicData[i] = [professionalData.academic[i].year, professionalData.academic[i].degree , professionalData.academic[i].disciplines, 
-                professionalData.academic[i].uni, id] ;
-
-                connection.query(`INSERT INTO member_academic (year,degree,disciplines,university,professionalID)\
-                    VALUES (?,?,?,?,(SELECT professionalID FROM member_professional WHERE professionalID = '${id}'))` , 
-                    academicData[i], (error, results, fields) => {
-                    if(error) {
-                        res.status(404).send(error);
-                        // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-                        // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-                        // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-                        deleteRow('member_personal', 'personalID', id);
-                        deleteRow('member_official', 'officialID', id);
-                        deleteRow('member_professional', 'professionalID', id);
-                        return 
-                    }                    
-                    
-                });
-
-    }
-    addProposer(res,id,membershipData)  
-    
-    
-}
-
-
-function addProposer(res,id,membershipData) {
-    const proposer = [id, membershipData.proposer$seconder.proposer.name, membershipData.proposer$seconder.proposer.memNo , 
-        membershipData.proposer$seconder.proposer.address ,membershipData.proposer$seconder.proposer.contactNo];
+function addProposer(res,id,member) {
+    const proposer = [id, member.proposer$seconder.proposer.name, member.proposer$seconder.proposer.memNo , 
+        member.proposer$seconder.proposer.address ,member.proposer$seconder.proposer.contactNo];
 
     connection.query(`INSERT INTO proposers (proposerID, name,membershipNo,address,contactNo) \
     VALUES (?,?,?,?,?)` , proposer, (error, results, fields) => {
@@ -188,21 +84,21 @@ function addProposer(res,id,membershipData) {
             // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
             // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
             // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            deleteRow('member_personal', 'personalID', id);
-            deleteRow('member_official', 'officialID', id);
-            deleteRow('member_academic', 'professionalID', id);
-            deleteRow('member_professional', 'professionalID', id);
+            // deleteRow('member_personal', 'personalID', id);
+            // deleteRow('member_official', 'officialID', id);
+            // deleteRow('member_academic', 'professionalID', id);
+            // deleteRow('member_professional', 'professionalID', id);
             return 
         }
-        addSeconder(res,id,membershipData)
+        addSeconder(res,id,member,member,member,member)
         
 
     });
 }
 
-function addSeconder(res,id,membershipData) {
-    const seconder = [id, membershipData.proposer$seconder.seconder.name, membershipData.proposer$seconder.seconder.memNo , 
-        membershipData.proposer$seconder.seconder.address ,membershipData.proposer$seconder.seconder.contactNo];
+function addSeconder(res,id,member) {
+    const seconder = [id, member.proposer$seconder.seconder.name, member.proposer$seconder.seconder.memNo , 
+        member.proposer$seconder.seconder.address ,member.proposer$seconder.seconder.contactNo];
 
     connection.query(`INSERT INTO seconders (seconderID, name,membershipNo,address,contactNo) \
     VALUES (?,?,?,?,?)` , seconder, (error, results, fields) => {
@@ -214,49 +110,215 @@ function addSeconder(res,id,membershipData) {
             // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
             // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
             // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            deleteRow('member_personal', 'personalID', id);
-            deleteRow('member_official', 'officialID', id);
-            deleteRow('member_academic', 'professionalID', id);
-            deleteRow('member_professional', 'professionalID', id);
-            deleteRow('proposers', 'proposerID', id);
+            // deleteRow('member_personal', 'personalID', id);
+            // deleteRow('member_official', 'officialID', id);
+            // deleteRow('member_academic', 'professionalID', id);
+            // deleteRow('member_professional', 'professionalID', id);
+            // deleteRow('proposers', 'proposerID', id);
             return 
         }
-        addMembership(res,id,membershipData)
+        addMember(res,id,member)
     });
 }
 
-function addMembership(res,id,membershipData) {
-    const membership = [id, membershipData.gradeOfMem, membershipData.section , membershipData.memBefore , 
-        membershipData.memFrom , membershipData.memTo , membershipData.sendingAddrs, id, id] ;
+function addMember(res,id,member) {
 
-    connection.query(`INSERT INTO member_membership (membershipID, gradeOfMembership,section,memberBefore,memberFrom,memberTo,\
-        sendingAddrs,proposerID,seconderID)\
-    VALUES (?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
-    (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , membership, (error, results, fields) => {
+    const resAddrs = `${member.resAddOne}, ${member.resAddTwo }, ${member.resAddThree}, ${member.resAddFour}, 
+    ${member.resAddFive}` ;
+    const perAddrs =   `${member.perAddOne}, ${member.perAddTwo} , ${member.perAddThree}, ${member.perAddFour}, 
+    ${member.perAddFive}`;
+    const offAddrs =  `${member.offAddrslineOne}, ${member.offAddrslineTwo}, ${member.offAddrslineThree}, 
+    ${member.offAddrslineFour}, ${member.offAddrslineFive}`;
 
-        if(error) {
-            res.status(404).send(error);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
-            deleteRow('member_personal', 'personalID', id);
-            deleteRow('member_official', 'officialID', id);
-            deleteRow('member_academic', 'professionalID', id);
-            deleteRow('member_professional', 'professionalID', id);
-            deleteRow('proposers', 'proposerID', id);
-            deleteRow('seconders', 'seconderID', id);
-            return 
-        }
-        addMember(res,id)
+    const official = [id, member.designation, member.division , member.placeWork, member.offMobile, 
+    member.offLandNo, member.offFax, member.offEmail, offAddrs];
 
+    let enroll ;
+    let applied ;
+    if(member.enrollDate) {
+        enroll = new Date();
+    }
+    else if(member.appliedDate){
+        applied = new Date();
+    }
+    
+    //*****************   membershipNo, memberFolioNo , proposer and seconder needed ***********************
+    
+    const memberData = [ id ,  '' , member.gradeOfMem, member.section , member.status ,  enroll , applied, 
+        '' , member.title , member.nameWinitials , member.nameInFull , member.firstName , member.lastName , 
+        member.gender, member.dob, member.nic,  member.mobileNo, member.landNo, member.email, resAddrs, perAddrs,  
+        member.sendingAddrs , member.designation, member.division , member.placeWork, member.offMobile, 
+        member.offLandNo , member.offFax , member.offEmail , offAddrs , member.memBefore , member.memFrom , member.memTo ,
+        member.profession , member.fieldOfSpecial[0] , member.fieldOfSpecial[1] , 
+        member.fieldOfSpecial[2] , member.fieldOfSpecial[3] , member.fieldOfSpecial[4] , id, id
+    ]
+    memberFirstName = memberData[11]
+
+    connection.query(`INSERT INTO members (memberID , membershipNo , gradeOfMembership ,section ,status ,enrollDate , appliedDate , memberFolioNo , \
+        title , nameWinitials , fullName , commonFirst , commomLast , gender , dob , nic , mobileNo , fixedNo , email , resAddrs , perAddrs , sendingAddrs,\
+        designation , department , placeOfWork , offMobile , offLand , offFax , offEmail , offAddrs , memberBefore , memberFrom , memberTo ,\
+        profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, proposerID , seconderID )\
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
+        (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , memberData, (error, results, fields) => {
+        // (error) ? res.status(404).send(error) : addResAddress()
+            if(error) {
+                res.status(404).send(error);
+                return
+            }
+            addAcademic(id,res,member)
+        // console.log(id)
+            
     });
+
+
 }
+
+function addAcademic(id,res,member) {
+    
+    let academicData = [];
+    var i;
+    let isError = false;
+    for(i=0; i<member.academic.length; i++) 
+    {
+        
+        academicData[i] = [member.academic[i].year, member.academic[i].degree , member.academic[i].disciplines, 
+                member.academic[i].uni, id] ;
+
+        connection.query(`INSERT INTO member_academic (year,degree,disciplines,university,memberID)\
+            VALUES (?,?,?,?,(SELECT memberID FROM members WHERE memberID = '${id}'))` , 
+            academicData[i], (error, results, fields) => {
+
+            
+                if(error) {
+                    return res.status(404).send(error)
+
+                    // res.status(200).send("Successfully Added Member " + memberFirstName)                     
+                    // // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+                    // // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+                    // // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+                    // // deleteRow('member_personal', 'personalID', id);
+                    // // deleteRow('member_official', 'officialID', id);
+                    // // deleteRow('member_professional', 'professionalID', id);
+                    // return 
+                }
+                    
+            });
+
+    }    
+    
+            
+    // if(i === (member.academic.length-1)) 
+    res.status(200).send("Successfully Added Member " + memberFirstName)  
+    return
+}
+
+// function addPersonal(member,res,id,member) {
+//     const resAddrs = `${member.resAddOne}, ${member.resAddTwo }, ${member.resAddThree}, ${member.resAddFour}, 
+//     ${member.resAddFive}` ;
+//     const perAddrs =   `${member.perAddOne}, ${member.perAddTwo} , ${member.perAddThree}, ${member.perAddFour}, 
+//     ${member.perAddFive}`;
+
+//     const personal = [id, member.title, member.nameWinitials, member.nameInFull, member.firstName, member.lastName, 
+//     member.gender, member.dob, member.nic,  member.mobileNo, member.landNo, member.email, resAddrs, perAddrs];
+        
+//     memberFirstName = personal[4]
+
+//     connection.query(`INSERT INTO member_personal (personalID, title, nameWinitials, fullName, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs)\
+//     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)` , personal, (error, results, fields) => {
+//         // (error) ? res.status(404).send(error) : addResAddress()
+//             if(error) {
+//                 res.status(404).send(error);
+//                 return 
+//             }
+//             addOfficial(res,id,member)
+//         // console.log(id)
+            
+//     });
+    
+// };
+
+// function addOfficial(res,id,member) {
+//     const offAddrs =  `${member.offAddrslineOne}, ${member.offAddrslineTwo}, ${member.offAddrslineThree}, 
+//     ${member.offAddrslineFour}, ${member.offAddrslineFive}`;
+
+//     const official = [id, member.designation, member.division , member.placeWork, member.offMobile, 
+//     member.offLandNo, member.offFax, member.offEmail, offAddrs];
+
+//     connection.query(`INSERT INTO member_official (officialID, designation,department,placeOfWork,offMobile,offLand,\
+//         offFax,offEmail,offAddrs)\
+//     VALUES (?,?,?,?,?,?,?,?,?)` , official, (error, results, fields) => {
+        
+//         // (!error) ? res.status(200).send("Successfully Added Member " + memberFirstName) : res.status(404).send(error);
+//         if(error) {
+//             res.status(404).send(error);
+//             // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+//             deleteRow('member_personal', "personalID", id);
+//             return 
+//         }
+//         addProfessional(res,id,member)
+            
+//         // if(error) databaseError = error;
+    
+//     });
+// }
+// function addProfessional(res,id,member) {
+//     const professional = [id, member.profession, member.fieldOfSpecial[0] , member.fieldOfSpecial[1] , 
+//     member.fieldOfSpecial[2] , member.fieldOfSpecial[3] , member.fieldOfSpecial[4]];
+
+//     connection.query(`INSERT INTO member_professional (professionalID, profession,specialization1,specialization2,specialization3,specialization4,\
+//         specialization5)\
+//     VALUES (?,?,?,?,?,?,?)` , professional, (error, results, fields) => {
+
+//         if(error) {
+//             res.status(404).send(error);
+//             // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+//             // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+//             deleteRow('member_personal', 'personalID', id);
+//             deleteRow('member_official', 'officialID', id);
+//             return 
+//         }
+//         addAcademic(id,res,member)
+
+//     });
+// }
+
+
+
+
+
+
+// function addMembership(res,id,member) {
+//     const membership = [id, member.gradeOfMem, member.section , member.memBefore , 
+//         member.memFrom , member.memTo , member.sendingAddrs, id, id] ;
+
+//     connection.query(`INSERT INTO member_membership (membershipID, gradeOfMembership,section,memberBefore,memberFrom,memberTo,\
+//         sendingAddrs,proposerID,seconderID)\
+//     VALUES (?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
+//     (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , membership, (error, results, fields) => {
+
+//         if(error) {
+//             res.status(404).send(error);
+//             // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+//             // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+//             // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+//             // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+//             // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+//             // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+//             deleteRow('member_personal', 'personalID', id);
+//             deleteRow('member_official', 'officialID', id);
+//             deleteRow('member_academic', 'professionalID', id);
+//             deleteRow('member_professional', 'professionalID', id);
+//             deleteRow('proposers', 'proposerID', id);
+//             deleteRow('seconders', 'seconderID', id);
+//             return 
+//         }
+//         addMember(res,id)
+
+//     });
+// }
 
 // function addPayment(res,id) {
-//     if(membershipData.status === 'member') {
+//     if(member.status === 'member') {
 //     const payment = [id, paymentData.paymentDoneDate, paymentData.receivedData , paymentData.paymentMethod , 
 //         paymentData.amount , paymentData.bank , paymentData.branch, paymentData.accountNo, paymentData.description,id] ;
 
@@ -311,51 +373,51 @@ function addMembership(res,id,membershipData) {
 //     }
 // }
 
-function addMember(res,id) {
-    let enroll ;
-    let applied ;
-    if(membershipData.enrollDate) {
-        enroll = new Date();
-    }
-    else if(membershipData.appliedDate){
-        applied = new Date();
-    }
-    const member = [id, membershipData.status, enroll , applied , '' , '' , '', '', id, id, id, id, id] ;
+// function addMember(res,id) {
+//     let enroll ;
+//     let applied ;
+//     if(member.enrollDate) {
+//         enroll = new Date();
+//     }
+//     else if(member.appliedDate){
+//         applied = new Date();
+//     }
+//     const member = [id, member.status, enroll , applied , '' , '' , '', '', id, id, id, id, id] ;
 
-    connection.query(`INSERT INTO members (memberID, status, enrollDate, appliedDate, councilPosition, memberFolioNo, membershipNo,\
-        memPaidLast, personalID, officialID, professionalID, paymentID, membershipID)\
-    VALUES (?,?,?,?,?,?,?,?, (SELECT personalID FROM member_personal WHERE personalID='${id}'), 
-    (SELECT officialID FROM member_official WHERE officialID='${id}'), 
-    (SELECT professionalID FROM member_professional WHERE professionalID='${id}'), 
-    (SELECT paymentID FROM payments WHERE paymentID='${id}'),
-    (SELECT membershipID FROM member_membership WHERE membershipID='${id}'))` , 
+//     connection.query(`INSERT INTO members (memberID, status, enrollDate, appliedDate, councilPosition, memberFolioNo, membershipNo,\
+//         memPaidLast, personalID, officialID, professionalID, paymentID, membershipID)\
+//     VALUES (?,?,?,?,?,?,?,?, (SELECT personalID FROM member_personal WHERE personalID='${id}'), 
+//     (SELECT officialID FROM member_official WHERE officialID='${id}'), 
+//     (SELECT professionalID FROM member_professional WHERE professionalID='${id}'), 
+//     (SELECT paymentID FROM payments WHERE paymentID='${id}'),
+//     (SELECT membershipID FROM member_membership WHERE membershipID='${id}'))` , 
     
     
-    member, (error, results, fields) => {
+//     member, (error, results, fields) => {
 
-        if(error) {
-            res.status(404).send(error);
-            // connection.query(`DELETE FROM payments WHERE paymentID='${id}'`);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            // connection.query(`DELETE FROM member_membership WHERE membershipID='${id}'`);
-            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
-            deleteRow('payments', 'paymentID', id);
-            deleteRow('member_personal', 'personalID', id);
-            deleteRow('member_official', 'officialID', id);
-            deleteRow('member_academic', 'professionalID', id);
-            deleteRow('member_professional', 'professionalID', id);
-            deleteRow('member_membership', 'membershipID', id);
-            deleteRow('proposers', 'proposerID', id);
-            deleteRow('seconders', 'seconderID', id);
-            return 
-        }   
-        res.status(200).send("Successfully Added Member " + memberFirstName)
-    });
-}
+//         if(error) {
+//             res.status(404).send(error);
+//             // connection.query(`DELETE FROM payments WHERE paymentID='${id}'`);
+//             // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
+//             // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
+//             // connection.query(`DELETE FROM member_membership WHERE membershipID='${id}'`);
+//             // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
+//             // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
+//             // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
+//             // connection.query(`DELETE FROM seconders WHERE seconderID='${id}'`);
+//             deleteRow('payments', 'paymentID', id);
+//             deleteRow('member_personal', 'personalID', id);
+//             deleteRow('member_official', 'officialID', id);
+//             deleteRow('member_academic', 'professionalID', id);
+//             deleteRow('member_professional', 'professionalID', id);
+//             deleteRow('member_membership', 'membershipID', id);
+//             deleteRow('proposers', 'proposerID', id);
+//             deleteRow('seconders', 'seconderID', id);
+//             return 
+//         }   
+//         res.status(200).send("Successfully Added Member " + memberFirstName)
+//     });
+// }
 
 
 

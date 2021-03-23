@@ -12,6 +12,8 @@ const viewMembers = require('./routes/viewMemberRoute');
 const viewAllMembers = require('./routes/allMembersRoute')
 const userLogin = require('./routes/userLogin');
 const searchMember = require('./routes/searchMembersRoute')
+const addPayment = require('./routes/addPaymentRoute')
+const viewPayments = require('./routes/viewPayments')
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -33,6 +35,8 @@ app.use('/slaas/api/user/upload-members', uploadMembers);
 app.use('/slaas/api/user/view/members', viewMembers);
 // app.use('/slaas/api/user/view/members/all', viewAllMembers);
 app.use('/slaas/api/user/search', searchMember);
+app.use('/slaas/api/user/payment', addPayment);
+app.use('/slaas/api/user/payment/view', viewPayments);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
@@ -69,8 +73,8 @@ app.get('/slaas/api/',(req,res) => {
         }
 
     });
-       
-      connection.end();
+    
+    connection.end();
 });
 
 
