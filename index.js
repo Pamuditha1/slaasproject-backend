@@ -4,6 +4,9 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors')
 
+var path = require('path');
+global.appRoot = path.resolve(__dirname);
+
 const auth = require('./routes/authRoute');
 const users = require('./routes/userRoute');
 const members = require('./routes/memberRoute');
@@ -14,6 +17,9 @@ const userLogin = require('./routes/userLogin');
 const searchMember = require('./routes/searchMembersRoute')
 const addPayment = require('./routes/addPaymentRoute')
 const viewPayments = require('./routes/viewPayments')
+const viewProfile = require('./routes/viewProfile')
+const profilePicUpload = require('./routes/uploadProfilePic')
+const viewProfilePic = require('./routes/viewProfilePic')
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -31,8 +37,11 @@ app.use(cors())
 app.use(express.json());
 app.use('/slaas/api/register-user', users);
 app.use('/slaas/api/user/register-member', members);
+app.use('/slaas/api/user/add-profilepic', profilePicUpload);
+app.use('/slaas/api/user/get-profilepic', viewProfilePic);
 app.use('/slaas/api/user/upload-members', uploadMembers);
 app.use('/slaas/api/user/view/members', viewMembers);
+app.use('/slaas/api/user/member/profile', viewProfile)
 // app.use('/slaas/api/user/view/members/all', viewAllMembers);
 app.use('/slaas/api/user/search', searchMember);
 app.use('/slaas/api/user/payment', addPayment);
@@ -80,4 +89,5 @@ app.get('/slaas/api/',(req,res) => {
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`Listening on port ${port} ...`));
+
 
