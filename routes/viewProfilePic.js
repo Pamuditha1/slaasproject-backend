@@ -6,6 +6,20 @@ const path = require('path');
 
 app.use(cors());
 
+const mysql = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : '0112704105',
+  database : 'slaasproject'
+});
+
+connection.connect((err) => {
+  if(!err) return console.log("Successfully connected to MySql database");
+
+  else console.log("Database connection failed" , send.stringify(err));   
+});
+
 
 // router.get('/:id',function(req, res) {
 
@@ -24,16 +38,30 @@ router.get('/:name', function (req, res, next) {
         } 
     }
 
-    var fileName = req.params.name + '.jpg'
-    console.log(fileName)
+    // var fileName = req.params.name + '.jpg'
+    // console.log(fileName)
 
-    res.sendFile(fileName, options, function (err) {
-      if (err) {
-        console.log(err)
-      } else {
-        console.log('Sent:', fileName)
-      }
-    })
+    connection.query(`SELECT image FROM members
+    WHERE nic='${req.params.name}';`
+
+    , async function (error, results, fields) {
+        if (error) throw error;
+        
+        console.log(results[0].image);
+
+        const fileName = results[0].image
+
+        res.sendFile(fileName, options, function (err) {
+          if (err) {
+            console.log(err)
+          } else {
+            console.log('Sent:', fileName)
+          }
+        })
+
+    });
+
+    
   })
 
 module.exports = router;
