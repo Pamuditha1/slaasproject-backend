@@ -29,7 +29,9 @@ connection.connect((err) => {
 // });
 router.get('/:name', function (req, res, next) {
 
-    var options = {
+  if(req.params.name) {
+
+      var options = {
         root: path.join(appRoot + '/profilePics'),
         dotfiles: 'deny',
         headers: {
@@ -60,8 +62,7 @@ router.get('/:name', function (req, res, next) {
         })
 
     });
-
-    
-  })
+  }
+})
 
 module.exports = router;

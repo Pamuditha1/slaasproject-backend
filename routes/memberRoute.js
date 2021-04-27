@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
     //Check whether the member available
     console.log(req.body)
     member = req.body;
-    console.log(member.academic.length)
+    console.log(member.memberData.academic.length)
     // officialData = req.body.officialData;
     // professionalData = req.body.professionalData;
     // membershipData = req.body.membershipData;
@@ -71,50 +71,31 @@ router.post('/', async (req, res) => {
     });   
 });
 
-function addProposer(res,id,member) {
-    const proposer = [id, member.proposer$seconder.proposer.name, member.proposer$seconder.proposer.memNo , 
-        member.proposer$seconder.proposer.address ,member.proposer$seconder.proposer.contactNo];
+function addProposer(res,id, member) {
+    const proposer = [id, member.proposer.name, member.proposer.memNo , 
+        member.proposer.address ,member.proposer.contactNo];
 
     connection.query(`INSERT INTO proposers (proposerID, name,membershipNo,address,contactNo) \
     VALUES (?,?,?,?,?)` , proposer, (error, results, fields) => {
 
         if(error) {
             res.status(404).send(error);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            // deleteRow('member_personal', 'personalID', id);
-            // deleteRow('member_official', 'officialID', id);
-            // deleteRow('member_academic', 'professionalID', id);
-            // deleteRow('member_professional', 'professionalID', id);
             return 
         }
-        addSeconder(res,id,member,member,member,member)
-        
+        addSeconder(res,id,member)
 
     });
 }
 
 function addSeconder(res,id,member) {
-    const seconder = [id, member.proposer$seconder.seconder.name, member.proposer$seconder.seconder.memNo , 
-        member.proposer$seconder.seconder.address ,member.proposer$seconder.seconder.contactNo];
+    const seconder = [id, member.seconder.name, member.seconder.memNo , 
+        member.seconder.address ,member.seconder.contactNo];
 
     connection.query(`INSERT INTO seconders (seconderID, name,membershipNo,address,contactNo) \
     VALUES (?,?,?,?,?)` , seconder, (error, results, fields) => {
 
         if(error) {
             res.status(404).send(error);
-            // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-            // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-            // connection.query(`DELETE FROM member_academic WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-            // connection.query(`DELETE FROM proposers WHERE proposerID='${id}'`);
-            // deleteRow('member_personal', 'personalID', id);
-            // deleteRow('member_official', 'officialID', id);
-            // deleteRow('member_academic', 'professionalID', id);
-            // deleteRow('member_professional', 'professionalID', id);
-            // deleteRow('proposers', 'proposerID', id);
             return 
         }
         addMember(res,id,member)
@@ -123,43 +104,50 @@ function addSeconder(res,id,member) {
 
 function addMember(res,id,member) {
 
-    const resAddrs = `${member.resAddOne}, ${member.resAddTwo }, ${member.resAddThree}, ${member.resAddFour}, 
-    ${member.resAddFive}` ;
-    const perAddrs =   `${member.perAddOne}, ${member.perAddTwo} , ${member.perAddThree}, ${member.perAddFour}, 
-    ${member.perAddFive}`;
-    const offAddrs =  `${member.offAddrslineOne}, ${member.offAddrslineTwo}, ${member.offAddrslineThree}, 
-    ${member.offAddrslineFour}, ${member.offAddrslineFive}`;
+    const memberData = member.memberData
 
-    const official = [id, member.designation, member.division , member.placeWork, member.offMobile, 
-    member.offLandNo, member.offFax, member.offEmail, offAddrs];
+    const resAddrs = `${memberData.resAddOne}, ${memberData.resAddTwo }, ${memberData.resAddThree}, ${memberData.resAddFour}, ${memberData.resAddFive}` ;
+    const perAddrs =   `${memberData.perAddOne}, ${memberData.perAddTwo} , ${memberData.perAddThree}, ${memberData.perAddFour}, ${memberData.perAddFive}`;
+    const offAddrs =  `${memberData.offAddrslineOne}, ${memberData.offAddrslineTwo}, ${memberData.offAddrslineThree}, ${memberData.offAddrslineFour}, ${memberData.offAddrslineFive}`;
+
+    function validAddress(memberData) {
+
+        if(memberData.sendingAddrs === "Residence") return resAddrs
+        else if(memberData.sendingAddrs === "Permanent") return perAddrs
+        else if(memberData.sendingAddrs === "Official") return offAddrs
+    }
+    const validAddrs = validAddress(memberData)
+
+    // const official = [id, memberData.designation, memberData.division , memberData.placeWork, memberData.offMobile, 
+    // memberData.offLandNo, memberData.offFax, memberData.offEmail, offAddrs];
 
     let enroll ;
     let applied ;
-    if(member.enrollDate) {
+    if(memberData.enrollDate) {
         enroll = new Date();
     }
-    else if(member.appliedDate){
+    else if(memberData.appliedDate){
         applied = new Date();
     }
     
-    //*****************   membershipNo, memberFolioNo , proposer and seconder needed ***********************
+    //*****************  memberDataFolioNo , proposer and seconder needed ***********************
     
-    const memberData = [ id ,  '' , member.gradeOfMem, member.section , member.status ,  enroll , applied, 
-        '' , member.title , member.nameWinitials , member.nameInFull , member.firstName , member.lastName , 
-        member.gender, member.dob, member.nic,  member.mobileNo, member.landNo, member.email, resAddrs, perAddrs,  
-        member.sendingAddrs , member.designation, member.division , member.placeWork, member.offMobile, 
-        member.offLandNo , member.offFax , member.offEmail , offAddrs , member.memBefore , member.memFrom , member.memTo ,
-        member.profession , member.fieldOfSpecial[0] , member.fieldOfSpecial[1] , 
-        member.fieldOfSpecial[2] , member.fieldOfSpecial[3] , member.fieldOfSpecial[4] , id, id
+    const memberDataArr = [ id ,  member.membershipNo , memberData.gradeOfMem, memberData.section , memberData.status ,  enroll , applied, 
+        '' , memberData.title , memberData.nameWinitials , memberData.nameInFull , memberData.firstName , memberData.lastName , 
+        memberData.gender, memberData.dob, memberData.nic,  memberData.mobileNo, memberData.landNo, memberData.email, resAddrs, perAddrs,  
+        validAddrs , memberData.designation, memberData.division , memberData.placeWork, memberData.offMobile, 
+        memberData.offLandNo , memberData.offFax , memberData.offEmail , offAddrs , memberData.memBefore , memberData.memFrom , memberData.memTo ,
+        memberData.profession , memberData.fieldOfSpecial[0] , memberData.fieldOfSpecial[1] , 
+        memberData.fieldOfSpecial[2] , memberData.fieldOfSpecial[3] , memberData.fieldOfSpecial[4] , id, id
     ]
-    memberFirstName = memberData[11]
+    memberFirstName = memberDataArr[11]
 
     connection.query(`INSERT INTO members (memberID , membershipNo , gradeOfMembership ,section ,status ,enrollDate , appliedDate , memberFolioNo , \
         title , nameWinitials , fullName , commonFirst , commomLast , gender , dob , nic , mobileNo , fixedNo , email , resAddrs , perAddrs , sendingAddrs,\
         designation , department , placeOfWork , offMobile , offLand , offFax , offEmail , offAddrs , memberBefore , memberFrom , memberTo ,\
         profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, proposerID , seconderID )\
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
-        (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , memberData, (error, results, fields) => {
+        (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , memberDataArr, (error, results, fields) => {
         // (error) ? res.status(404).send(error) : addResAddress()
             if(error) {
                 res.status(404).send(error);
@@ -178,11 +166,11 @@ function addAcademic(id,res,member) {
     let academicData = [];
     var i;
     let isError = false;
-    for(i=0; i<member.academic.length; i++) 
+    for(i=0; i<member.memberData.academic.length; i++) 
     {
         
-        academicData[i] = [member.academic[i].year, member.academic[i].degree , member.academic[i].disciplines, 
-                member.academic[i].uni, id] ;
+        academicData[i] = [member.memberData.academic[i].year, member.memberData.academic[i].degree , member.memberData.academic[i].disciplines, 
+                member.memberData.academic[i].uni, id] ;
 
         connection.query(`INSERT INTO member_academic (year,degree,disciplines,university,memberID)\
             VALUES (?,?,?,?,(SELECT memberID FROM members WHERE memberID = '${id}'))` , 
@@ -191,15 +179,6 @@ function addAcademic(id,res,member) {
             
                 if(error) {
                     return res.status(404).send(error)
-
-                    // res.status(200).send("Successfully Added Member " + memberFirstName)                     
-                    // // connection.query(`DELETE FROM member_personal WHERE personalID='${id}'`);
-                    // // connection.query(`DELETE FROM member_official WHERE officialID='${id}'`);
-                    // // connection.query(`DELETE FROM member_professional WHERE professionalID='${id}'`);
-                    // // deleteRow('member_personal', 'personalID', id);
-                    // // deleteRow('member_official', 'officialID', id);
-                    // // deleteRow('member_professional', 'professionalID', id);
-                    // return 
                 }
                     
             });

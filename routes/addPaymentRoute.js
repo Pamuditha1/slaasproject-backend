@@ -46,41 +46,49 @@ router.post('/', async (req, res) => {
     //Check whether the member available
     console.log(req.body)
     const payment = req.body;
+    const paymentData = req.body.paymentData
+    const previousRecords = req.body.previousRecords
 
-    res.status(200).send('Payment Received')
+    console.log(payment)
+    console.log("payment data", paymentData)
+    console.log("previous data", payment)
 
-    // connection.query(`SELECT memberID FROM members WHERE membershipNo='${payment.membershipNo}' 
-    // OR nic='${payment.nic}'`, async function (error, results, fields) {
+    // res.status(200).send('Payment Received')
 
-    //     if (error) throw error;
+    connection.query(`SELECT memberID FROM members WHERE membershipNo='${paymentData.paymentRecord.membershipNo}' 
+    OR nic='${paymentData.paymentRecord.nic}'`, async function (error, results, fields) {
+
+        if (error) throw error;
         
-    //     if(results.length > 1) {
-    //         console.log("Two Members Found");
-    //         res.status(404).send('Two Members Found. Payment Rejected');
-    //         return;
-    //     }
-    //     // if (results.length === 0) {
-    //     //     console.log("No member record");
-    //     //     res.status(400).send('No member record. Payment Rejected');
-    //     //     return;
-    //     // } 
-    //     console.log(results[0].memberID)
-    //     const memberID = results[0].memberID
-    //     addPayment(res, payment, memberID)
+        if(results.length > 1) {
+            console.log("More than 1 member Found");
+            res.status(404).send('More than 1 member found. Payment Rejected');
+            return;
+        }
+        if (results.length === 0) {
+            console.log("No member record");
+            res.status(400).send('No member record. Payment Rejected');
+            return;
+        } 
+        console.log(results[0].memberID)
+        const memberID = results[0].memberID
+        addPayment(res, paymentData, previousRecords, memberID)
 
-    // });
+    });
     
 });
 
-function addPayment(res, payment, memberID) {
+function addPayment(res, paymentData, previousRecords, memberID) {
 
-    const paymentData = [payment.invoiceNo, payment.nic, payment.date, payment.paymentMethod , 
-        payment.yearOfPayment ,payment.admissionFee, payment.yearlyFee,
-        payment.arrearsFee, payment.idCardFee, payment.total, payment.description, payment.totalWords,  memberID];
+    const paymentDataSave = [paymentData.invoiceNo, paymentData.dateTimeSave, paymentData.today, paymentData.time,
+        paymentData.paymentRecord.paymentMethod , paymentData.paymentRecord.yearOfPayment ,
+        paymentData.paymentRecord.admissionFee,paymentData.paymentRecord.arrearsFee,
+        paymentData.paymentRecord.yearlyFee, paymentData.paymentRecord.idCardFee, 
+        paymentData.total, paymentData.paymentRecord.description, paymentData.totalWords,  memberID];
         
-    connection.query(`INSERT INTO payments (invoiceNo, nic, date, type, yearOfPayment, admission, arrears, yearlyFee, idCardFee, total ,description \
+    connection.query(`INSERT INTO payments (invoiceNo, timeStamp, date, time, type, yearOfPayment, admission, arrears, yearlyFee, idCardFee, total ,description \
         ,totalWords, memberID) \
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)` , paymentData , (error, results, fields) => {
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)` , paymentDataSave , (error, results, fields) => {
 
         if(error) {
             res.status(404).send(error);
@@ -88,7 +96,7 @@ function addPayment(res, payment, memberID) {
         }
         console.log(results)
         console.log('Successfully Added Payment')
-        
+        res.status(200).send('Payment Successfully Recorded')
 
     });
 }
