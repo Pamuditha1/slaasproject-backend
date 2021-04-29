@@ -20,14 +20,15 @@ connection.connect((err) => {
 
 router.use(bodyParser.json())
 
-router.get('/', async (req, res) => {
+router.get('/:word', async (req, res) => {
 
     // console.log(req)
-    console.log(req.body)
-    const searchWord = req.body.word
-    console.log(searchWord)
+    // console.log(req.body)
+    // console.log("params", req.params.word)
+    const searchWord = req.params.word
+    // console.log("Searched Word",searchWord)
 
-    if(!req.body) {
+    if(!req.params.word) {
         return res.status(404).send('Empty Search')
     }
 
@@ -44,56 +45,59 @@ router.get('/', async (req, res) => {
 // });
 
 function searchMember(searchWord, res) {
+
     connection.query(`SELECT * FROM members WHERE 
-    title LIKE '%${searchWord}%' OR nameWinitials LIKE '%${searchWord}%' OR fullName LIKE '%${searchWord}%' OR commonFirst LIKE '%${searchWord}%' 
-    OR commomLast LIKE '%${searchWord}%' OR gender LIKE '%${searchWord}%' OR dob LIKE '%${searchWord}%' OR nic LIKE '%${searchWord}%' OR mobileNo LIKE '%${searchWord}%' 
+    membershipNo LIKE '%${searchWord}%' OR nameWinitials LIKE '%${searchWord}%' OR fullName LIKE '%${searchWord}%' OR commonFirst LIKE '%${searchWord}%' 
+    OR commomLast LIKE '%${searchWord}%' OR dob LIKE '%${searchWord}%' OR nic LIKE '%${searchWord}%' OR mobileNo LIKE '%${searchWord}%' 
     OR fixedNo LIKE '%${searchWord}%' OR email LIKE '%${searchWord}%' OR resAddrs LIKE '%${searchWord}%' OR perAddrs LIKE '%${searchWord}%'
     OR designation LIKE '%${searchWord}%' OR department LIKE '%${searchWord}%' OR placeOfWork LIKE '%${searchWord}%' OR offMobile LIKE '%${searchWord}%' 
     OR offLand LIKE '%${searchWord}%' OR offFax LIKE '%${searchWord}%' OR offEmail LIKE '%${searchWord}%' OR offAddrs LIKE '%${searchWord}%'
     OR profession LIKE '%${searchWord}%' OR specialization1 LIKE '%${searchWord}%' OR specialization2 LIKE '%${searchWord}%' OR specialization3 LIKE '%${searchWord}%' 
     OR specialization4 LIKE '%${searchWord}%' OR specialization5 LIKE '%${searchWord}%' OR gradeOfMembership LIKE '%${searchWord}%' OR section LIKE '%${searchWord}%' 
-    OR sendingAddrs LIKE '%${searchWord}%' OR status LIKE '%${searchWord}%' OR enrollDate LIKE '%${searchWord}%' OR appliedDate LIKE '%${searchWord}%' OR councilPosition LIKE '%${searchWord}%' 
-    OR memberFolioNo LIKE '%${searchWord}%' OR membershipNo LIKE '%${searchWord}%' OR memPaidLast LIKE '%${searchWord}%'`,
+    OR status LIKE '%${searchWord}%' OR enrollDate LIKE '%${searchWord}%' OR appliedDate LIKE '%${searchWord}%' OR councilPosition LIKE '%${searchWord}%' 
+    OR memberFolioNo LIKE '%${searchWord}%' OR memPaidLast LIKE '%${searchWord}%'`,
 
     async function (error, results, fields) {
         if (error) throw error;
         
+        console.log("printing results", results)
         if(results.length === 0) {
-            searchAcademic(searchWord, res)
+            // searchAcademic(searchWord, res)
+            res.status(404).send('No Record Found')
             return
         }
-        console.log(results)
+        console.log(results.length)
         res.status(200).send(results)        
 
     });
 }
 
-function searchAcademic(searchWord, res) {
+// function searchAcademic(searchWord, res) {
 
-    connection.query(`SELECT * FROM member_academic WHERE 
-    year LIKE '%${searchWord}%' OR degree LIKE '%${searchWord}%' OR disciplines LIKE '%${searchWord}%' OR university LIKE '%${searchWord}%' `,
+//     connection.query(`SELECT * FROM member_academic , members WHERE 
+//     year LIKE '%${searchWord}%' OR degree LIKE '%${searchWord}%' OR disciplines LIKE '%${searchWord}%' OR university LIKE '%${searchWord}%' `,
 
-    async function (error, results, fields) {
-        if (error) throw error;
+//     async function (error, results, fields) {
+//         if (error) throw error;
         
-        if(results.length === 0) {
-            // searchMembership(searchWord, res)
-            // return
-            console.log('No Record Found')
-            res.status(404).send('No Record Found')
-            return
-        }
-        // let i = 0
-        // let professionalIDS = []
-        // results.forEach(e => {
-        //     professionalIDS[i] = e.professionalID
-        //     i++
-        // });
-        console.log(results)
-        res.status(200).send(results)
+//         if(results.length === 0) {
+//             // searchMembership(searchWord, res)
+//             // return
+//             console.log('No Record Found')
+//             res.status(404).send('No Record Found')
+//             return
+//         }
+//         // let i = 0
+//         // let professionalIDS = []
+//         // results.forEach(e => {
+//         //     professionalIDS[i] = e.professionalID
+//         //     i++
+//         // });
+//         console.log(results)
+//         res.status(200).send(results)
 
-    });
-}
+//     });
+// }
 
 // function searchPersonal(searchWord, res) {
 
