@@ -23,6 +23,10 @@ const viewProfilePic = require('./routes/viewProfilePic')
 const proposerAseconder = require('./routes/getProposerSeconderRoute')
 const getMembershipNo = require('./routes/getMembershipNo')
 const memberForReceipt = require('./routes/getMemberForReceipt')
+const terminateMember = require('./routes/terminateMemberRoute')
+const paymentsHistory = require('./routes/paymentsHistoryRoute')
+const sendMails = require('./routes/sendEmailRoute')
+const outdated = require('./routes/getOutdatedMemberships')
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -52,6 +56,10 @@ app.use('/slaas/api/user/refrees', proposerAseconder);
 app.use('/slaas/api/user/membershipNo', getMembershipNo)
 app.use('/slaas/api/user/receipt', memberForReceipt)
 app.use('/slaas/api/user/payment/view', viewPayments);
+app.use('/slaas/api/user/mails', sendMails);
+app.use('/slaas/api/user/terminate-member', terminateMember);
+app.use('/slaas/api/user/member/payment-records', paymentsHistory);
+app.use('/slaas/api/user/outdated', outdated);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
@@ -93,7 +101,7 @@ app.get('/slaas/api/',(req,res) => {
 });
 
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 14350;
 app.listen(port, () => console.log(`Listening on port ${port} ...`));
 
 

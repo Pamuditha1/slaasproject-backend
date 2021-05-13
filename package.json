@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node index.js"
   },
   "author": "pamuditharajapaksha@gmail.com",
   "license": "ISC",
@@ -14,16 +15,18 @@
     "body-parser": "^1.19.0",
     "config": "^3.3.2",
     "cors": "^2.8.5",
+    "date-diff": "^0.2.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "generate-unique-id": "^2.0.1",
     "joi": "^17.2.1",
     "joi-objectid": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mongoose": "^5.12.1",
     "multer": "^1.4.2",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.6.0",
     "utils": "^0.3.1",
     "uuid": "^8.3.1"
   },

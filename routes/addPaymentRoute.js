@@ -55,8 +55,10 @@ router.post('/', async (req, res) => {
 
     // res.status(200).send('Payment Received')
 
-    connection.query(`SELECT memberID FROM members WHERE membershipNo='${paymentData.paymentRecord.membershipNo}' 
-    OR nic='${paymentData.paymentRecord.nic}'`, async function (error, results, fields) {
+    // connection.query(`SELECT memberID FROM members WHERE membershipNo='${paymentData.paymentRecord.membershipNo}' 
+    // OR nic='${paymentData.paymentRecord.nic}'`, async function (error, results, fields) {
+    connection.query(`SELECT memberID FROM members WHERE memberID='${paymentData.paymentRecord.memberID}'`
+    , async function (error, results, fields) {
 
         if (error) throw error;
         
@@ -92,14 +94,70 @@ function addPayment(res, paymentData, previousRecords, memberID) {
 
         if(error) {
             res.status(404).send(error);
+            console.log(error)
             return 
         }
-        console.log(results)
-        console.log('Successfully Added Payment')
-        res.status(200).send('Payment Successfully Recorded')
 
+        let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
+        let arrearsContinued = parseInt(previousRecords.arrearsConti)
+
+        if(arrearsPaid > 0) {
+            updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid, arrearsContinued)
+            return
+        }
+        else {
+            console.log('Successfully Added Payment')
+            res.status(200).send('Payment Successfully Recorded')  
+        }
+        
+        // let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
+        // let arrearsContinued = parseInt(previousRecords.arrearsConti)
+        // console.log(arrearsPaid)
+        // console.log(arrearsContinued)
     });
 }
+
+function updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid, arrearsContinued) {
+
+    // let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
+    // let arrearsContinued = parseInt(previousRecords.arrearsConti)
+
+    let newArrears = 0 ;    
+    let lastYear = ''
+    newArrears = arrearsContinued - arrearsPaid
+    let today = new Date()
+    console.log("Today", today)
+
+    if(newArrears < 0) newArrears = 0
+
+    // (typeof paymentData.paymentRecord.yearOfPayment != undefined || 
+    // typeof paymentData.paymentRecord.yearOfPayment != null || 
+    // paymentData.paymentRecord.yearOfPayment != '') 
+    paymentData.paymentRecord.yearOfPayment? 
+    lastYear = paymentData.paymentRecord.yearOfPayment : lastYear = previousRecords.lastPaidForYear
+
+    connection.query(`UPDATE members
+    SET arrearsConti='${newArrears}', lastPaidForYear='${lastYear}', 
+    memPaidLast='${today}'
+    WHERE memberID='${memberID}';`, (error, results, fields) => {
+
+        if(error) {
+            res.status(404).send(error);
+            console.log(error)
+            return 
+        }        
+        console.log("newArrears", newArrears)
+        res.status(200).json({
+            msg: "Payment Successfully Recorded",
+            data: newArrears.toString()
+        })
+        return   
+
+    });
+    
+
+}
+
 
 module.exports = router;
 

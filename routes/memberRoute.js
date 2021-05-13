@@ -49,11 +49,13 @@ router.post('/', async (req, res) => {
 
     id = uuidv1();
 
-    connection.query(`SELECT email FROM member_personal WHERE email='${member.email}'`, async function (error, results, fields) {
-        let databaseError;
-        if (error) throw error;
-        let i=0;
-        let alreadyReg = false;
+    addProposer(res,id,member)
+
+    // connection.query(`SELECT email FROM member_personal WHERE email='${member.email}'`, async function (error, results, fields) {
+    //     let databaseError;
+    //     if (error) throw error;
+    //     let i=0;
+    //     let alreadyReg = false;
         // for(i=0; i<results.length; i++) {
         //     if(member.email == results[i].email) {
         //         alreadyReg = true;
@@ -66,9 +68,9 @@ router.post('/', async (req, res) => {
         //     return;
         // } 
         // else 
-        addProposer(res,id,member)
+        // addProposer(res,id,member)
         
-    });   
+    // });   
 });
 
 function addProposer(res,id, member) {
@@ -82,6 +84,7 @@ function addProposer(res,id, member) {
             res.status(404).send(error);
             return 
         }
+        console.log('Proposer Saved')
         addSeconder(res,id,member)
 
     });
@@ -98,6 +101,7 @@ function addSeconder(res,id,member) {
             res.status(404).send(error);
             return 
         }
+        console.log('Seconder Saved')
         addMember(res,id,member)
     });
 }
@@ -138,21 +142,24 @@ function addMember(res,id,member) {
         validAddrs , memberData.designation, memberData.division , memberData.placeWork, memberData.offMobile, 
         memberData.offLandNo , memberData.offFax , memberData.offEmail , offAddrs , memberData.memBefore , memberData.memFrom , memberData.memTo ,
         memberData.profession , memberData.fieldOfSpecial[0] , memberData.fieldOfSpecial[1] , 
-        memberData.fieldOfSpecial[2] , memberData.fieldOfSpecial[3] , memberData.fieldOfSpecial[4] , id, id
+        memberData.fieldOfSpecial[2] , memberData.fieldOfSpecial[3] , memberData.fieldOfSpecial[4], memberData.lastPaidForYear, memberData.arrearstoPay , id, id
     ]
     memberFirstName = memberDataArr[11]
 
     connection.query(`INSERT INTO members (memberID , membershipNo , gradeOfMembership ,section ,status ,enrollDate , appliedDate , memberFolioNo , \
         title , nameWinitials , fullName , commonFirst , commomLast , gender , dob , nic , mobileNo , fixedNo , email , resAddrs , perAddrs , sendingAddrs,\
         designation , department , placeOfWork , offMobile , offLand , offFax , offEmail , offAddrs , memberBefore , memberFrom , memberTo ,\
-        profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, proposerID , seconderID )\
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
+        profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, lastPaidForYear, arrearsConti, proposerID , seconderID\
+        )\
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
         (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , memberDataArr, (error, results, fields) => {
         // (error) ? res.status(404).send(error) : addResAddress()
             if(error) {
                 res.status(404).send(error);
+                console.log("Member Error",error)
                 return
             }
+            console.log("Member Saved")
             addAcademic(id,res,member)
         // console.log(id)
             
@@ -187,6 +194,7 @@ function addAcademic(id,res,member) {
     
             
     // if(i === (member.academic.length-1)) 
+    console.log("Aca Saved")
     res.status(200).send("Successfully Added Member " + memberFirstName)  
     return
 }

@@ -16,21 +16,20 @@ connection.connect((err) => {
     else console.log("Database connection failed" , send.stringify(err));   
 });
 
-router.get('/:memNo', async (req, res) => {
+router.get('/:memID', async (req, res) => {
 
-    console.log("Sumery Came", req.params.memNo)
+    console.log("History Came", req.params.memID)
 
-    connection.query(`SELECT memberID, membershipNo, nameWinitials, nic, memPaidLast, lastPaidForYear, arrearsConti
-    FROM members
-    WHERE membershipNo = "${req.params.memNo}";`
+    connection.query(`SELECT * FROM payments
+    WHERE memberID = "${req.params.memID}";`
 
     , async function (error, results, fields) {
-        if (error) throw error;
+        if (error) console.log(error);
         
-        console.log(results[0]);
-        let lastDate = new Date(results[0].memPaidLast).toLocaleDateString()
-        results[0].memPaidLast = lastDate
-        res.send(results[0])
+        console.log("Payments History", results);
+        // let lastDate = new Date(results[0].memPaidLast).toLocaleDateString()
+        // results[0].memPaidLast = lastDate
+        res.send(results)
 
         // getSeconder(req, res, results[0])
     });

@@ -25,7 +25,7 @@ router.get('/all', async (req, res) => {
     // AND member_personal.personalID = member_membership.membershipID AND members.memberID = member_personal.personalID
     // AND member_personal.personalID = member_professional.professionalID AND member_academic.professionalID = member_professional.professionalID;`
     connection.query(`SELECT 
-    title, nameWinitials, commonFirst, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
+    title, nameWinitials, commonFirst, status, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
     councilPosition, memberFolioNo, membershipNo, designation, department, placeOfWork, offMobile, offLand, offFax, offEmail, offAddrs, profession, 
     specialization1, specialization2, specialization3, specialization4, specialization5, degree, university
     FROM 
@@ -37,6 +37,10 @@ router.get('/all', async (req, res) => {
         if (error) throw error;
         
         // console.log(results);
+        // results = results.map(m => {
+        //     m.enrollDate = new Date(m.enrollDate).toLocaleDateString()
+        // })
+        console.log(results);
         res.status(200).send(results);
 
     });

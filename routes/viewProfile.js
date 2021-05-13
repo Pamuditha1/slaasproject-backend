@@ -34,6 +34,7 @@ router.get('/:id', async (req, res) => {
         
         console.log(results[0]);
         results[0].enrollDate = new Date(results[0].enrollDate).toLocaleDateString()
+        results[0].dot = new Date(results[0].dot).toLocaleDateString()
         // console.log('Updated Date', results[0]);
 
         console.log('With Member', results[0])
