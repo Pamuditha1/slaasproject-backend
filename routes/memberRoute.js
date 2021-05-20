@@ -15,6 +15,7 @@ var connection = mysql.createConnection({
     password : '0112704105',
     database : 'slaasproject'
 });
+// var connection = mysql.createConnection({host: "slaasdatabase.mysql.database.azure.com", user: "adminpamu@slaasdatabase", password: '0112704105Abc', database: 'slaasproject', port: 3306});
 
 
 connection.connect((err) => {
