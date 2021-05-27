@@ -13,7 +13,8 @@ router.post('/:memNo',function(req, res) {
 
     console.log("Req Received")
     console.log(req.params.memNo)
-    let dot = new Date();
+    let today = new Date();
+    let dot = today.toISOString()
     // return res.status(200).send("Membership Terminated.")  
 
     connection.query(`UPDATE members

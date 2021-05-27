@@ -18,10 +18,11 @@ connection.connect((err) => {
 
 router.get('/', async (req, res) => {
 
-    let today = new Date().getFullYear()
+    let today = new Date()
+
     console.log("Today Year", today)
     connection.query(`SELECT 
-    title, nameWinitials, status, dot, lastPaidForYear, arrearsConti, memPaidLast, nic, mobileNo, email, resAddrs, gradeOfMembership, section, enrollDate, 
+    title, nameWinitials, status, dot, lastPaidForYear, lastMembershipPaid, arrearsConti, memPaidLast, nic, mobileNo, email, resAddrs, gradeOfMembership, section, enrollDate, 
     councilPosition, memberFolioNo, membershipNo
     FROM 
     members;`
@@ -31,12 +32,19 @@ router.get('/', async (req, res) => {
         
         let filtered = results.filter((m) => {
 
-            if(m.lastPaidForYear) {
-                let lastPaid = m.lastPaidForYear
-                let dif = parseInt(today) - parseInt(lastPaid) 
-                console.log(dif)
-                if(dif > 1) return true
+            if(m.lastMembershipPaid) {
+                let lastPaidTime = new Date(m.lastMembershipPaid).getTime()
+                let todayTime = new Date(today).getTime()
 
+                let timeDiff = todayTime - lastPaidTime
+                let diffDays = timeDiff / (1000 * 60 * 60 * 24)
+
+                if(diffDays > 365) {
+                    m.lastMembershipPaid = new Date(m.lastMembershipPaid).toLocaleDateString()
+                    m.memPaidLast = new Date(m.memPaidLast).toLocaleDateString()
+                    m.dot = new Date(m.dot).toLocaleDateString()
+                    return true
+                }
                 return false
             }
             else false

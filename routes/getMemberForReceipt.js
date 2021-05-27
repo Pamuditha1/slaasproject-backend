@@ -20,7 +20,7 @@ router.get('/:memNo', async (req, res) => {
 
     console.log("Sumery Came", req.params.memNo)
 
-    connection.query(`SELECT memberID, membershipNo, nameWinitials, nic, memPaidLast, lastPaidForYear, arrearsConti
+    connection.query(`SELECT memberID, membershipNo, nameWinitials, nic, memPaidLast, lastPaidForYear, lastMembershipPaid, arrearsConti
     FROM members
     WHERE membershipNo = "${req.params.memNo}";`
 
@@ -28,7 +28,8 @@ router.get('/:memNo', async (req, res) => {
         if (error) throw error;
         
         console.log(results[0]);
-        let lastDate = new Date(results[0].memPaidLast).toLocaleDateString()
+        let lastDate = results[0].memPaidLast ? new Date(results[0].memPaidLast).toLocaleDateString() : ''
+        let lastMembershipPaidDate = results[0].lastMembershipPaid ? new Date(results[0].lastMembershipPaid).toLocaleDateString() : ''
         results[0].memPaidLast = lastDate
         res.send(results[0])
 

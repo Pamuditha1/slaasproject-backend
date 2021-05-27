@@ -129,15 +129,16 @@ function addMember(res,id,member) {
     let enroll ;
     let applied ;
     if(memberData.enrollDate) {
-        enroll = new Date();
+        enroll = new Date(memberData.enrollDate).toLocaleDateString() 
     }
-    else if(memberData.appliedDate){
-        applied = new Date();
+    if(memberData.appliedDate){
+        let today = new Date();
+        applied = new Date().toLocaleDateString()
     }
     
-    //*****************  memberDataFolioNo , proposer and seconder needed ***********************
+    //*****************  memberDataFolioNo  needed ***********************
     
-    const memberDataArr = [ id ,  member.membershipNo , memberData.gradeOfMem, memberData.section , memberData.status ,  enroll , applied, 
+    const memberDataArr = [ id ,  member.membershipNo , memberData.gradeOfMem, memberData.section , memberData.status ,  enroll , applied, memberData.council,
         '' , memberData.title , memberData.nameWinitials , memberData.nameInFull , memberData.firstName , memberData.lastName , 
         memberData.gender, memberData.dob, memberData.nic,  memberData.mobileNo, memberData.landNo, memberData.email, resAddrs, perAddrs,  
         validAddrs , memberData.designation, memberData.division , memberData.placeWork, memberData.offMobile, 
@@ -147,7 +148,7 @@ function addMember(res,id,member) {
     ]
     memberFirstName = memberDataArr[11]
 
-    connection.query(`INSERT INTO members (memberID , membershipNo , gradeOfMembership ,section ,status ,enrollDate , appliedDate , memberFolioNo , \
+    connection.query(`INSERT INTO members (memberID , membershipNo , gradeOfMembership ,section ,status ,enrollDate , appliedDate ,councilPosition, memberFolioNo , \
         title , nameWinitials , fullName , commonFirst , commomLast , gender , dob , nic , mobileNo , fixedNo , email , resAddrs , perAddrs , sendingAddrs,\
         designation , department , placeOfWork , offMobile , offLand , offFax , offEmail , offAddrs , memberBefore , memberFrom , memberTo ,\
         profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, lastPaidForYear, arrearsConti, proposerID , seconderID\
@@ -162,11 +163,8 @@ function addMember(res,id,member) {
             }
             console.log("Member Saved")
             addAcademic(id,res,member)
-        // console.log(id)
-            
+        // console.log(id)        
     });
-
-
 }
 
 function addAcademic(id,res,member) {
@@ -191,8 +189,7 @@ function addAcademic(id,res,member) {
                     
             });
 
-    }    
-    
+    }   
             
     // if(i === (member.academic.length-1)) 
     console.log("Aca Saved")

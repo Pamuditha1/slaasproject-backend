@@ -98,17 +98,15 @@ function addPayment(res, paymentData, previousRecords, memberID) {
             return 
         }
 
-        let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
-        let arrearsContinued = parseInt(previousRecords.arrearsConti)
-
-        if(arrearsPaid > 0) {
-            updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid, arrearsContinued)
-            return
-        }
-        else {
-            console.log('Successfully Added Payment')
-            res.status(200).send('Payment Successfully Recorded')  
-        }
+        updateArrears(res, paymentData, previousRecords, memberID)
+        // if(arrearsPaid > 0) {
+        //     updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid, arrearsContinued)
+        //     return
+        // }
+        // else {
+        //     console.log('Successfully Added Payment')
+        //     res.status(200).send('Payment Successfully Recorded')  
+        // }
         
         // let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
         // let arrearsContinued = parseInt(previousRecords.arrearsConti)
@@ -117,18 +115,21 @@ function addPayment(res, paymentData, previousRecords, memberID) {
     });
 }
 
-function updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid, arrearsContinued) {
+function updateArrears(res, paymentData, previousRecords, memberID) {
 
     // let arrearsPaid = parseInt(paymentData.paymentRecord.arrearsFee) 
     // let arrearsContinued = parseInt(previousRecords.arrearsConti)
+    let arrearsPaid = paymentData.paymentRecord.arrearsFee ? parseInt(paymentData.paymentRecord.arrearsFee) : 0
+    let arrearsContinued = previousRecords.arrearsConti ? parseInt(previousRecords.arrearsConti) : 0
 
-    let newArrears = 0 ;    
+    let newArrears = 0 ; 
     let lastYear = ''
-    newArrears = arrearsContinued - arrearsPaid
-    let today = new Date()
-    console.log("Today", today)
 
+    newArrears = arrearsContinued - arrearsPaid
     if(newArrears < 0) newArrears = 0
+
+    let today = new Date()
+    todayISO = today.toISOString()
 
     // (typeof paymentData.paymentRecord.yearOfPayment != undefined || 
     // typeof paymentData.paymentRecord.yearOfPayment != null || 
@@ -136,9 +137,12 @@ function updateArrears(res, paymentData, previousRecords, memberID, arrearsPaid,
     paymentData.paymentRecord.yearOfPayment? 
     lastYear = paymentData.paymentRecord.yearOfPayment : lastYear = previousRecords.lastPaidForYear
 
+    paymentData.paymentRecord.yearOfPayment?
+    lastMemPaidDate = todayISO : lastMemPaidDate = previousRecords.lastMembershipPaid
+
     connection.query(`UPDATE members
-    SET arrearsConti='${newArrears}', lastPaidForYear='${lastYear}', 
-    memPaidLast='${today}'
+    SET arrearsConti='${newArrears}', lastPaidForYear='${lastYear}', lastMembershipPaid='${lastMemPaidDate}', 
+    memPaidLast='${todayISO}'
     WHERE memberID='${memberID}';`, (error, results, fields) => {
 
         if(error) {

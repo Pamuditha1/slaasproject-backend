@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql');
 const cors = require('cors')
+const envVariables = require('./envVariables')
 
 var path = require('path');
 global.appRoot = path.resolve(__dirname);
@@ -28,6 +29,10 @@ const paymentsHistory = require('./routes/paymentsHistoryRoute')
 const sendMails = require('./routes/sendEmailRoute')
 const outdated = require('./routes/getOutdatedMemberships')
 const filterPayments = require('./routes/filterPayments')
+const calculateArrears = require('./routes/calculateArrears')
+const grades = require('./routes/gradesRoute')
+const sections = require('./routes/sectionsRoute')
+
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.log('FATAL ERROR : jwtPrivateKey is not defined.');
@@ -62,17 +67,14 @@ app.use('/slaas/api/user/mails', sendMails);
 app.use('/slaas/api/user/terminate-member', terminateMember);
 app.use('/slaas/api/user/member/payment-records', paymentsHistory);
 app.use('/slaas/api/user/outdated', outdated);
+app.use('/slaas/api/user/calculate-arrears', calculateArrears);
+app.use('/slaas/api/user/grades', grades);
+app.use('/slaas/api/user/sections', sections);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
 
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '0112704105',
-  database : 'slaasproject',
-  multipleStatements: true
-});
+var connection = mysql.createConnection(envVariables.mysqlConnection);
  
 connection.connect((err) => {
     if(!err) return console.log("Successfully connected to MySql database");
