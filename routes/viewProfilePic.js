@@ -28,7 +28,7 @@ connection.connect((err) => {
 //     // res.status(200).sendFile(image)
 // });
 router.get('/:name', function (req, res, next) {
-
+  console.log('Request Params Image name', req.params.name)
   if(req.params.name) {
 
       var options = {

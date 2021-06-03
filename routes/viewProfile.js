@@ -71,7 +71,7 @@ function getAcademicData(res, member) {
 }
 
 function getProposer(res, memberAaca) {
-    connection.query(`SELECT * FROM 
+    connection.query(`SELECT name, membershipNo, address, contactNo FROM 
     proposers
     WHERE 
     proposerID = '${memberAaca.member.memberID}';`
@@ -94,7 +94,7 @@ function getProposer(res, memberAaca) {
     });
 }
 function getSeconder(res, memProposer) {
-    connection.query(`SELECT * FROM 
+    connection.query(`SELECT name, membershipNo, address, contactNo FROM 
     seconders
     WHERE 
     seconderID = '${memProposer.member.memberID}';`

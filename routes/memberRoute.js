@@ -153,7 +153,7 @@ function addMember(res,id,member) {
         designation , department , placeOfWork , offMobile , offLand , offFax , offEmail , offAddrs , memberBefore , memberFrom , memberTo ,\
         profession , specialization1 , specialization2 , specialization3 , specialization4 , specialization5, lastPaidForYear, arrearsConti, proposerID , seconderID\
         )\
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,(SELECT proposerID FROM proposers WHERE proposerID='${id}'),\
         (SELECT seconderID FROM seconders WHERE seconderID='${id}'))` , memberDataArr, (error, results, fields) => {
         // (error) ? res.status(404).send(error) : addResAddress()
             if(error) {
