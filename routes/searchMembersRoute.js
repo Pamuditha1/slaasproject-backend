@@ -55,7 +55,7 @@ function searchMember(searchWord, res) {
     OR profession LIKE '%${searchWord}%' OR specialization1 LIKE '%${searchWord}%' OR specialization2 LIKE '%${searchWord}%' OR specialization3 LIKE '%${searchWord}%' 
     OR specialization4 LIKE '%${searchWord}%' OR specialization5 LIKE '%${searchWord}%' OR gradeOfMembership LIKE '%${searchWord}%' OR section LIKE '%${searchWord}%' 
     OR status LIKE '%${searchWord}%' OR enrollDate LIKE '%${searchWord}%' OR appliedDate LIKE '%${searchWord}%' OR councilPosition LIKE '%${searchWord}%' 
-    OR memberFolioNo LIKE '%${searchWord}%' OR memPaidLast LIKE '%${searchWord}%'`,
+    OR memberFolioNo LIKE '%${searchWord}%' OR memPaidLast LIKE '%${searchWord}%' ORDER BY enrollDate DESC;`,
 
     async function (error, results, fields) {
         if (error) throw error;
@@ -66,7 +66,7 @@ function searchMember(searchWord, res) {
             res.status(404).send('No Record Found')
             return
         }
-        console.log(results.length)
+        // console.log(results.length)
         res.status(200).send(results)        
 
     });

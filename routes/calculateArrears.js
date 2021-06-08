@@ -101,8 +101,8 @@ function getMembersOfPayingGrades(grades, gradesWfee, res) {
 
                 //select last membershi payment > 1 year
                 if(diffDays > 365) {
-                    //select last update > difference between today and last membership payment date
-                    if(diffDaysUpdated > diffDays) {
+                    //select last update diff < difference between today and last membership payment date diff
+                    if(diffDaysUpdated < diffDays) {
                         return true
                     }
                 }
@@ -166,5 +166,6 @@ function setNewArrears(newArrears, memberID) {
 
     });
 }
+
 
 module.exports = router;

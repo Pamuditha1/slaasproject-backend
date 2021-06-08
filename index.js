@@ -33,6 +33,7 @@ const calculateArrears = require('./routes/calculateArrears')
 const grades = require('./routes/gradesRoute')
 const sections = require('./routes/sectionsRoute')
 const continueMembership = require('./routes/continueTerminatedRoute')
+const terminationSettings = require('./routes/terminateSettingsRoute')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -72,6 +73,7 @@ app.use('/slaas/api/user/outdated', outdated);
 app.use('/slaas/api/user/calculate-arrears', calculateArrears);
 app.use('/slaas/api/user/grades', grades);
 app.use('/slaas/api/user/sections', sections);
+app.use('/slaas/api/user/terminate-settings', terminationSettings);
 app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);

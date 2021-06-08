@@ -31,7 +31,7 @@ router.get('/all', async (req, res) => {
     FROM 
     members , member_academic 
     WHERE 
-    members.memberID = member_academic.memberID;`
+    members.memberID = member_academic.memberID ORDER BY enrollDate DESC;`
 
     , async function (error, results, fields) {
         if (error) throw error;
@@ -40,7 +40,7 @@ router.get('/all', async (req, res) => {
         // results = results.map(m => {
         //     m.enrollDate = new Date(m.enrollDate).toLocaleDateString()
         // })
-        console.log(results);
+        // console.log(results);
         res.status(200).send(results);
 
     });

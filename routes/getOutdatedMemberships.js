@@ -18,6 +18,7 @@ connection.connect((err) => {
 
 router.get('/', async (req, res) => {
 
+
     let today = new Date()
 
     console.log("Today Year", today)
@@ -49,11 +50,28 @@ router.get('/', async (req, res) => {
             }
             else false
         })
-        console.log(filtered);
-        console.log(filtered.length)
+        // console.log(filtered);
+        // console.log(filtered.length)
         res.status(200).send(filtered);
 
     });
 });
+
+function getTerminationDays() {
+    connection.query(`SELECT period FROM terminations WHERE id='1';`
+
+    , function (error, results, fields) {
+
+        if (error) console.log(error);
+
+        console.log('TerDays', results[0].period)
+
+        pe = results[0].period
+
+        return new Promise((resolve, reject) => {
+            resolve(results[0].period)
+        })      
+    });
+}
 
 module.exports = router;
