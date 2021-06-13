@@ -4,13 +4,7 @@ const router = express.Router();
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const nodemailMailGun = require('nodemailer-mailgun-transport')
-
-let authen = {
-    auth : {
-        api_key: 'e00f8b14354959ee5e26c64abb43ae6f-90ac0eb7-1043890c',
-        domain: 'sandboxb482afdbd596492fb161129646e6ca0b.mailgun.org'
-    }
-};
+const env = require('../envVariables')
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -31,7 +25,7 @@ connection.connect((err) => {
 //         pass: '0112704105'
 //     }
 // });
-let transporter = nodemailer.createTransport(nodemailMailGun(authen));
+let transporter = nodemailer.createTransport(nodemailMailGun(env.emailAuth));
 
 let mailContent={
     from: 'slaasmembermanagement@gmail.com',
