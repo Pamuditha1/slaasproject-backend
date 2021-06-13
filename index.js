@@ -10,11 +10,12 @@ global.appRoot = path.resolve(__dirname);
 
 const auth = require('./routes/authRoute');
 const users = require('./routes/userRoute');
+const userLogin = require('./routes/loginUsers')
 const members = require('./routes/memberRoute');
 const uploadMembers = require('./routes/csvUploadRoute');
 const viewMembers = require('./routes/viewMemberRoute');
 const viewAllMembers = require('./routes/allMembersRoute')
-const userLogin = require('./routes/userLogin');
+// const userLogin = require('./routes/userLogin');
 const searchMember = require('./routes/searchMembersRoute')
 const addPayment = require('./routes/addPaymentRoute')
 const viewPayments = require('./routes/viewPayments')
@@ -34,6 +35,9 @@ const grades = require('./routes/gradesRoute')
 const sections = require('./routes/sectionsRoute')
 const continueMembership = require('./routes/continueTerminatedRoute')
 const terminationSettings = require('./routes/terminateSettingsRoute')
+const getCommitties = require('./routes/CommittiesRoute')
+const getCommMembers = require('./routes/committyMembersRoute')
+const MemberForSetCommity = require('./routes/MemberForCommittee')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -51,6 +55,7 @@ const terminationSettings = require('./routes/terminateSettingsRoute')
 app.use(cors())
 app.use(express.json());
 app.use('/slaas/api/register-user', users);
+app.use('/slaas/api/login-user', userLogin);
 app.use('/slaas/api/user/register-member', members);
 app.use('/slaas/api/user/add-profilepic', profilePicUpload);
 app.use('/slaas/api/user/get-profilepic', viewProfilePic);
@@ -74,7 +79,10 @@ app.use('/slaas/api/user/calculate-arrears', calculateArrears);
 app.use('/slaas/api/user/grades', grades);
 app.use('/slaas/api/user/sections', sections);
 app.use('/slaas/api/user/terminate-settings', terminationSettings);
-app.use('/slaas/api/user/login', userLogin);
+app.use('/slaas/api/user/committies', getCommitties);
+app.use('/slaas/api/user/members/commity', getCommMembers);
+app.use('/slaas/api/user/commity/set', MemberForSetCommity);
+// app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);
 

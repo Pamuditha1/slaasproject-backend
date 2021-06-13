@@ -47,8 +47,13 @@ router.post('/', async (req, res) => {
     // professionalData = req.body.professionalData;
     // membershipData = req.body.membershipData;
     // paymentData = req.body.paymentData;
-
-    id = uuidv1();
+    if(req.body.memberID) {
+        id=req.body.memberID
+    }
+    else{
+        id = uuidv1();
+    }
+    
 
     addProposer(res,id,member)
 
@@ -83,6 +88,7 @@ function addProposer(res,id, member) {
 
         if(error) {
             res.status(404).send(error);
+            console.log('AddPropoerError', error)
             return 
         }
         console.log('Proposer Saved')
@@ -100,6 +106,7 @@ function addSeconder(res,id,member) {
 
         if(error) {
             res.status(404).send(error);
+            console.log('AddSeconderError', error)
             return 
         }
         console.log('Seconder Saved')
@@ -184,7 +191,9 @@ function addAcademic(id,res,member) {
 
             
                 if(error) {
+                    console.log('AcademicError', error)
                     return res.status(404).send(error)
+                    
                 }
                     
             });

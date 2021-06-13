@@ -4,6 +4,7 @@ const Joi = require('joi');
 
 const router = express.Router();
 const mysql = require('mysql');
+const { v1: uuidv1 } = require('uuid');
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -11,6 +12,7 @@ var connection = mysql.createConnection({
     password : '0112704105',
     database : 'slaasproject'
 });
+let id = '';
    
   connection.connect((err) => {
       if(!err) return console.log("Successfully connected to MySql database");
@@ -55,13 +57,53 @@ router.post('/', async (req, res) => {
     });
 });
 
+
+
+router.post('/applicant', async (req, res) => {
+
+    id = uuidv1();
+
+    const { error } = validateUser(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    //Check whether the user available
+    connection.query(`SELECT email FROM applicants WHERE email='${req.body.email}'`, async function (error, results, fields) {
+        if (error) throw error;
+        let i=0;
+        let alreadyReg = false;
+        for(i=0; i<results.length; i++) {
+            if(req.body.email == results[i].email) {
+                alreadyReg = true;
+                break;
+            }            
+        }
+        if (alreadyReg) {
+            
+            console.log("Applicant already Registered .");
+            res.status(400).send('Applicant already Registered.');
+        } else {
+
+            const salt = await bcrypt.genSalt(10)
+            let enPassword = await bcrypt.hash(req.body.password, salt)            
+    
+            const user = [req.body.name, req.body.contact, req.body.email, enPassword, id, "Applicant"];
+        
+            connection.query("INSERT INTO applicants (username,mobile,email,password,applicantID, type)\
+            VALUES (?,?,?,?,?,?)" , user, (error, results, fields) => {
+            !error ? res.status(200).send("Successfully Registered Applicant " + user[0]) 
+            : console.log(error.sqlMessage);
+            });
+        }
+
+    });
+});
+
 function validateUser(user) {
     const schema = Joi.object({
-        userName: Joi.string().min(5).max(50).required(),
+        name: Joi.string().min(5).max(50).required(),
+        contact: Joi.string().min(10).max(10).required(),
         email: Joi.string().min(5).max(255).required().email(),
         password: Joi.string().min(5).max(255).required(),
-        accountType: Joi.string().min(3).max(255).required()
-        
     });
     return schema.validate(user);
 }

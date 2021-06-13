@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-    console.log(req.body)
+    // console.log(req.body)
 
     connection.query(`INSERT INTO grades (grade, membershipFee) VALUES ('${req.body.grade}', '${req.body.membershipFee}') `, 
     (error, results, fields) => {
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
             return 
         }
 
-        console.log(results)
+        // console.log(results)
         res.status(200).send({
             msg: "Grade Successfully Added",
             data: req.body.grade
@@ -57,7 +57,7 @@ router.post('/', async (req, res) => {
 
 router.post('/update', async (req, res) => {
 
-    console.log(req.body)
+    // console.log(req.body)
 
     connection.query(`UPDATE grades
     SET membershipFee='${req.body.membershipFee}' WHERE grade='${req.body.grade}';`, (error, results, fields) => {

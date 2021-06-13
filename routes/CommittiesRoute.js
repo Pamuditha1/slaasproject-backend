@@ -17,7 +17,7 @@ connection.connect((err) => {
 
 router.get('/', async (req, res) => {
 
-    connection.query(`SELECT keyName, section FROM sections;`
+    connection.query(`SELECT * FROM committies;`
 
     , async function (error, results, fields) {
 
@@ -31,12 +31,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-    console.log(req.body)
+    console.log("Committe Post", req.body)
 
-    let sectionData = [req.body.key, req.body.section]
+    let committiesData = [req.body.committe]
 
-    connection.query(`INSERT INTO sections ( keyName, section) VALUES (?,?);` , 
-    sectionData , (error, results, fields) => {
+    connection.query(`INSERT INTO committies ( committe ) VALUES (?);` , 
+    committiesData , (error, results, fields) => {
 
         if(error) {
             res.status(404).send(error);
@@ -44,16 +44,14 @@ router.post('/', async (req, res) => {
             return 
         }
 
-        // console.log(results)
+        console.log(results)
         res.status(200).send({
-            msg: "Section Successfully Added",
+            msg: "Committee Successfully Added",
             data: {
-                key: req.body.key,
-                sections: req.body.section
+                committe: req.body.committe
             }
         })
         
     });
 });
-
-module.exports = router;
+module.exports = router

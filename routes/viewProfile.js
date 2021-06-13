@@ -112,7 +112,32 @@ function getSeconder(res, memProposer) {
             seconder: results[0]
         }
         console.log('With Seconder', memSeconder)
-        res.status(200).send(memSeconder)
+        getCommitties(res, memSeconder)
+        // res.status(200).send(memSeconder)
+
+    });
+}
+
+function getCommitties(res, memSeconder) {
+    connection.query(`SELECT * FROM 
+    officebearershistory
+    WHERE 
+    memberID = '${memSeconder.member.memberID}';`
+
+    , async function (error, results, fields) {
+        if (error) throw error;
+        
+        // console.log(results)
+        // res.status(200).json({
+        //     member: preResult,
+        //     academic: results
+        // });
+        const memCommi = {
+            ...memSeconder,
+            committies: results
+        }
+        console.log('With Committee', memCommi)
+        res.status(200).send(memCommi)
 
     });
 }
