@@ -38,6 +38,8 @@ const terminationSettings = require('./routes/terminateSettingsRoute')
 const getCommitties = require('./routes/CommittiesRoute')
 const getCommMembers = require('./routes/committyMembersRoute')
 const MemberForSetCommity = require('./routes/MemberForCommittee')
+const updateMemberData = require('./routes/updateMemberProfileData')
+const getTerminated = require('./routes/getTerminatedMembers')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -75,6 +77,7 @@ app.use('/slaas/api/user/terminate-member', terminateMember);
 app.use('/slaas/api/user/continue-terminated', continueMembership)
 app.use('/slaas/api/user/member/payment-records', paymentsHistory);
 app.use('/slaas/api/user/outdated', outdated);
+app.use('/slaas/api/user/terminated', getTerminated);
 app.use('/slaas/api/user/calculate-arrears', calculateArrears);
 app.use('/slaas/api/user/grades', grades);
 app.use('/slaas/api/user/sections', sections);
@@ -82,6 +85,7 @@ app.use('/slaas/api/user/terminate-settings', terminationSettings);
 app.use('/slaas/api/user/committies', getCommitties);
 app.use('/slaas/api/user/members/commity', getCommMembers);
 app.use('/slaas/api/user/commity/set', MemberForSetCommity);
+app.use('/slaas/api/user/member/update', updateMemberData);
 // app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);

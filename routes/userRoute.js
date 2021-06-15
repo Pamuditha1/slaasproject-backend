@@ -23,13 +23,13 @@ let id = '';
   });
 
 
-router.post('/', async (req, res) => {
+router.post('/admin', async (req, res) => {
 
-    const { error } = validateUser(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    // const { error } = validateUser(req.body);
+    // if (error) return res.status(400).send(error.details[0].message);
 
     //Check whether the user available
-    connection.query(`SELECT email FROM users WHERE email='${req.body.email}'`, async function (error, results, fields) {
+    connection.query(`SELECT email FROM adminlogins WHERE email='${req.body.email}'`, async function (error, results, fields) {
         if (error) throw error;
         let i=0;
         let alreadyReg = false;
@@ -44,13 +44,17 @@ router.post('/', async (req, res) => {
             console.log("User already Registered .");
             res.status(400).send('User already Registered.');
         } else {
-            const user = [req.body.userName, req.body.officeID, req.body.email, req.body.password, req.body.accountType];
-            const salt = await bcrypt.genSalt(10);
-            user[3] = await bcrypt.hash(user[3], salt); 
+
+            const salt = await bcrypt.genSalt(10)
+            let enPassword = await bcrypt.hash(req.body.password, salt)            
+    
+            const user = [req.body.userName, req.body.officeID, req.body.email, enPassword, req.body.nic, 
+                req.body.mobile, req.body.fixed, req.body.address];
         
-            connection.query("INSERT INTO users (userName,officeID,email,password,accountType)\
-            VALUES (?,?,?,?,?)" , user, (error, results, fields) => {
-            !error ? res.status(200).send("Successfully Added User " + user[0]) : res.json(error);
+            connection.query("INSERT INTO adminlogins (userName, officeID, email, password, nic, mobile, fixed, address)\
+            VALUES (?,?,?,?,?,?,?,?)" , user, (error, results, fields) => {
+            !error ? res.status(200).send("Successfully Registered the User " + user[0]) 
+            : console.log(error.sqlMessage);
             });
         }
 

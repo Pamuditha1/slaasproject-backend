@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const Joi = require('joi');
 const { v1: uuidv1 } = require('uuid');
+const env = require('../envVariables')
+const jwt = require('jsonwebtoken')
 
 const generateUniqueId = require('generate-unique-id');
 // const {addPersonal,addResAddress} = require('../queries/memberRegisterQueries')
@@ -32,6 +34,7 @@ let memberFirstName = '';
 let id = '';
 
 let member = '';
+let username = ''
 // let paymentData = '';
 
 router.post('/', async (req, res) => {
@@ -42,6 +45,8 @@ router.post('/', async (req, res) => {
     //Check whether the member available
     console.log(req.body)
     member = req.body;
+    username = req.body.username
+
     console.log(member.memberData.academic.length)
     // officialData = req.body.officialData;
     // professionalData = req.body.professionalData;
@@ -202,8 +207,41 @@ function addAcademic(id,res,member) {
             
     // if(i === (member.academic.length-1)) 
     console.log("Aca Saved")
-    res.status(200).send("Successfully Added Member " + memberFirstName)  
-    return
+    console.log("acc type", member.memberData.status)
+    // res.status(200).send("Successfully Added Member " + memberFirstName)  
+    if(member.memberData.status == "Applicant") {
+        updateApplicant(id, res)
+    }
+    else {
+        res.status(200).json({
+            msg: "Application Succesfully Submitted"
+        })
+        return
+    }
+    
+}
+
+function updateApplicant(id, res) {
+
+    connection.query(`UPDATE applicants
+    SET type='Applied' WHERE applicantID='${id}';`, (error, results, fields) => {
+
+        if(error) {
+            res.status(404).send(error);
+            console.log(error)
+            return 
+        }
+        console.log("Username for token", username)
+        console.log("ID for token", id)
+        const token = jwt.sign({id : id, username: username, type: 'Applied'}, env.jewtKey)
+        res.status(200).json({
+            jwt: token,
+            type: 'Applied',
+            msg: "Application Succesfully Submitted"
+        })    
+
+    });
+    
 }
 
 // function addPersonal(member,res,id,member) {
