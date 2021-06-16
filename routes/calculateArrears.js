@@ -33,11 +33,27 @@ router.get('/last-update', async (req, res) => {
 
 router.get('/', async (req, res) => {
 
-    getGrades(res)
+    // getGrades(res)
+    getTerminationDates(res)
 
 });
 
-function getGrades(res) {
+function getTerminationDates(res) {
+
+    connection.query(`SELECT * FROM terminations;`
+
+    , async function (error, results, fields) {
+
+        if (error) console.log(error);
+     
+        // console.log("Date", results[0].period)
+        let datesToTerminate = results[0].period
+        getGrades(res, datesToTerminate)        
+
+    });
+}
+
+function getGrades(res, datesToTerminate) {
 
     connection.query(`SELECT grade, membershipFee FROM grades WHERE membershipFee != 0;`
 
@@ -52,14 +68,12 @@ function getGrades(res) {
         });
      
         console.log(gradesWfee)
-        getMembersOfPayingGrades(grades, gradesWfee, res)
-
-        
+        getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate)        
 
     });
 }
 
-function getMembersOfPayingGrades(grades, gradesWfee, res) {
+function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate) {
 
     let orString = ''
 
@@ -100,7 +114,9 @@ function getMembersOfPayingGrades(grades, gradesWfee, res) {
                 let diffDaysUpdated = timeDiffUpdate/ (1000 * 60 * 60 * 24)
 
                 //select last membershi payment > 1 year
-                if(diffDays > 365) {
+                // if(diffDays > 365) {
+                    if(diffDays > datesToTerminate) {
+                    
                     //select last update diff < difference between today and last membership payment date diff
                     if(diffDaysUpdated < diffDays) {
                         return true

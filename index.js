@@ -40,6 +40,8 @@ const getCommMembers = require('./routes/committyMembersRoute')
 const MemberForSetCommity = require('./routes/MemberForCommittee')
 const updateMemberData = require('./routes/updateMemberProfileData')
 const getTerminated = require('./routes/getTerminatedMembers')
+const sendReminderMails = require('./routes/sendReminderEmails')
+const autoTerminate = require('./routes/autoTerminateMembers')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -86,6 +88,8 @@ app.use('/slaas/api/user/committies', getCommitties);
 app.use('/slaas/api/user/members/commity', getCommMembers);
 app.use('/slaas/api/user/commity/set', MemberForSetCommity);
 app.use('/slaas/api/user/member/update', updateMemberData);
+app.use('/slaas/api/user/reminder-mails', sendReminderMails);
+app.use('/slaas/api/user/auto-terminate', autoTerminate);
 // app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
 app.use('/slaas/api/auth', auth);

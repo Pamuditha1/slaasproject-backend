@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
             return 
         }
 
-        console.log(results)
+        // console.log(results)
         res.status(200).send({
             msg: "Committee Successfully Added",
             data: {
@@ -54,4 +54,39 @@ router.post('/', async (req, res) => {
         
     });
 });
+
+router.get('/history/:comm', async (req, res) => {
+
+    connection.query(`SELECT fromD, toD from officebearershistory WHERE committee="${req.params.comm}" GROUP BY fromD ;`
+
+    , async function (error, results, fields) {
+
+        if (error) console.log(error);
+        
+        // console.log(results)
+        let dateRanges = results
+        getMemberAccordingToDates(dateRanges, req, res)
+        // res.status(200).send(results);
+
+    });
+});
+
+function getMemberAccordingToDates(dateRanges, req, res) {
+
+    connection.query(`SELECT * from officebearershistory WHERE committee="${req.params.comm}";`
+
+    , async function (error, results, fields) {
+
+        if (error) console.log(error);
+        
+        // console.log(results)
+        let response = {
+            ranges: dateRanges,
+            members: results
+        }
+        res.status(200).send(response);
+
+    });
+}
+
 module.exports = router
