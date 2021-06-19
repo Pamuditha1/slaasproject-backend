@@ -17,14 +17,6 @@ connection.connect((err) => {
 
     else console.log("Database connection failed" , send.stringify(err));   
 });
-
-// let transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth:{
-//         user: 'pamudithaweb@gmail.com',
-//         pass: '0112704105'
-//     }
-// });
 let transporter = nodemailer.createTransport(nodemailMailGun(env.emailAuth));
 
 let mailContent={

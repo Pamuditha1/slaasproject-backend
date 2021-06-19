@@ -102,6 +102,63 @@ router.post('/applicant', async (req, res) => {
     });
 });
 
+
+
+router.post('/member', async (req, res) => {
+
+    console.log("Reg Mem",req.body)
+
+    // const { error } = validateUser(req.body);
+    // if (error) return res.status(400).send(error.details[0].message);
+
+    //Check whether the user available
+    connection.query(`SELECT membershipNo FROM memberlogins WHERE membershipNo='${req.body.membershipNo}'`, async function (error, results, fields) {
+        if (error) {
+            console.log(error)
+            throw error
+        
+        }
+        let i=0;
+        let alreadyReg = false;
+        for(i=0; i<results.length; i++) {
+            if(req.body.membershipNo == results[i].membershipNo) {
+                alreadyReg = true;                
+                break;
+            }            
+        }
+        if (alreadyReg) {
+            
+            console.log("Member account already exists");
+            res.status(400).send("Member account already exists");
+        } else {
+
+            connection.query(`SELECT membershipNo, memberID FROM members WHERE membershipNo='${req.body.membershipNo}'`, 
+            async function (error, results, fields) {
+
+                if (error) {
+                    console.log(error)
+                    throw error
+                
+                }
+
+                const salt = await bcrypt.genSalt(10)
+                let enPassword = await bcrypt.hash(req.body.password, salt)            
+        
+                const user = [results[0].memberID, req.body.membershipNo, enPassword];
+            
+                connection.query("INSERT INTO memberlogins (memberID, membershipNo, password)\
+                VALUES (?,?,?)" , user, (error, results, fields) => {
+                !error ? res.status(200).send("Successfully Registered the Member " + user[1]) 
+                : console.log(error.sqlMessage);
+                });
+            })
+
+            
+        }
+
+    });
+});
+
 function validateUser(user) {
     const schema = Joi.object({
         name: Joi.string().min(5).max(50).required(),

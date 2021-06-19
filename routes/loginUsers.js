@@ -133,6 +133,60 @@ router.post('/applicant', async (req, res) => {
     });
 });
 
+
+router.post('/member', async (req, res) => {
+
+    // const { error } = validateLogin(req.body);
+    // if (error) return res.status(400).send(error.details[0].message);
+
+    //Check whether the user available
+    console.log('Mem', req.body)
+    connection.query(`SELECT memberID, membershipNo, password FROM memberlogins WHERE membershipNo='${req.body.membershipNo}'`, async function (error, results, fields) {
+        console.log("results", results)
+        if (error) throw error;
+        let i=0;
+        let alreadyReg = false;
+        let passwordCorrect = false;
+        let memberID = '';
+        // console.log(results)
+        for(i=0; i<results.length; i++) {
+            if(req.body.membershipNo == results[i].membershipNo) {
+                alreadyReg = true;
+                passwordCorrect = await bcrypt.compare(req.body.password, results[i].password);
+                console.log('pass corr', passwordCorrect)
+                if(passwordCorrect){
+                    
+                    memberID = results[i].memberID;
+                }
+                break;
+            }            
+        }
+        if (!alreadyReg) {
+            
+            console.log("User haven't Registered .");
+            res.status(400).json({
+                msg: "User haven't Registered"
+            });
+        } 
+        else if(!passwordCorrect) {
+            console.log("Password is incorrect .");
+            res.status(400).json({
+                msg: 'Password is incorrect.'
+            })
+        }
+        else {
+
+            const token = jwt.sign({id : memberID, memNo: req.body.membershipNo, type: "Member"}, env.jewtKey)
+            res.status(200).header('x-auth-token', token).json({
+                jwt: token,
+                msg: 'Logged In Successfully',
+                type: 'Member'
+            })
+        }
+
+    });
+});
+
 function validateLogin(user) {
     const schema = Joi.object({
         email: Joi.string().min(5).max(255).required().email(),
