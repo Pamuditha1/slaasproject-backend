@@ -20,6 +20,22 @@ var i = 0
 var success = 0
 var terminatedMembers = []
 
+router.get('/last-update', async (req, res) => {
+
+    connection.query(`SELECT date FROM terminationrecords ORDER BY id DESC LIMIT 1;`
+
+    , async function (error, results, fields) {
+
+        if (error) console.log(error);
+        console.log("Last Auto Terminate", results[0].date)
+        res.status(200).send(results[0].date);
+
+    });
+    
+    
+});
+
+
 router.get('/', async (req, res) => {
 
     console.log('req came')
@@ -46,7 +62,7 @@ function getTerminationDates(res) {
 function getMembersShouldTerminate(res, datesToTerminate) {
 
 
-    connection.query(`SELECT memberID, membershipNo, nameWinitials, status, lastMembershipPaid FROM members;`
+    connection.query(`SELECT memberID, membershipNo, nameWinitials, status, lastMembershipPaid FROM members WHERE status != 'Terminated';`
 
     , async function (error, results, fields) {
 
@@ -85,6 +101,14 @@ function getMembersShouldTerminate(res, datesToTerminate) {
             setTerminated(m.memberID, m.nameWinitials, m.membershipNo, outdatedCount, res)
         })  
         
+        connection.query(`INSERT INTO terminationrecords (date) VALUES ('${today.toISOString()}') `, 
+        (error, results, fields) => {
+
+            if(error) {
+                console.log(error)
+                throw error
+            } 
+        });
         
     });
 

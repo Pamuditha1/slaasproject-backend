@@ -53,6 +53,8 @@ router.get('/:name', function (req, res, next) {
 
         const fileName = results[0].image
 
+        if(fileName) {
+
         res.sendFile(fileName, options, function (err) {
           if (err) {
             console.log(err)
@@ -60,6 +62,7 @@ router.get('/:name', function (req, res, next) {
             console.log('Sent:', fileName)
           }
         })
+      }
 
     });
   }

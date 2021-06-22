@@ -42,6 +42,10 @@ const updateMemberData = require('./routes/updateMemberProfileData')
 const getTerminated = require('./routes/getTerminatedMembers')
 const sendReminderMails = require('./routes/sendReminderEmails')
 const autoTerminate = require('./routes/autoTerminateMembers')
+const getOneApplication = require('./routes/getOneApplication')
+const updateApplication = require('./routes/updateApplication')
+const getMailSettingsData = require('./routes/emailSettingsData')
+const getApplicationStatus = require('./routes/getApplicationProgress')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -92,6 +96,10 @@ app.use('/slaas/api/user/reminder-mails', sendReminderMails);
 app.use('/slaas/api/user/auto-terminate', autoTerminate);
 // app.use('/slaas/api/user/login', userLogin);
 app.use('/slaas/api/applicant/login', userLogin);
+app.use('/slaas/api/user/view-application', getOneApplication);
+app.use('/slaas/api/user/update-application', updateApplication);
+app.use('/slaas/api/user/mailsettings', getMailSettingsData);
+app.use('/slaas/api/user/application-progress', getApplicationStatus);
 app.use('/slaas/api/auth', auth);
 
 var connection = mysql.createConnection(envVariables.mysqlConnection);

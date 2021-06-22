@@ -27,7 +27,7 @@ router.get('/all', async (req, res) => {
     connection.query(`SELECT 
     title, nameWinitials, commonFirst, status, commomLast, gender, dob, nic, mobileNo, fixedNo, email, resAddrs, perAddrs, gradeOfMembership, section, enrollDate, 
     councilPosition, memberFolioNo, membershipNo, designation, department, placeOfWork, offMobile, offLand, offFax, offEmail, offAddrs, profession, 
-    specialization1, specialization2, specialization3, specialization4, specialization5, degree, university
+    specialization1, specialization2, specialization3, specialization4, specialization5, degree, university, appReasons
     FROM 
     members , member_academic 
     WHERE 

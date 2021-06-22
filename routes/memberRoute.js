@@ -4,6 +4,8 @@ const Joi = require('joi');
 const { v1: uuidv1 } = require('uuid');
 const env = require('../envVariables')
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer');
+const nodemailMailGun = require('nodemailer-mailgun-transport')
 
 const generateUniqueId = require('generate-unique-id');
 // const {addPersonal,addResAddress} = require('../queries/memberRegisterQueries')
@@ -35,6 +37,7 @@ let id = '';
 
 let member = '';
 let username = ''
+let memNo = ''
 // let paymentData = '';
 
 router.post('/', async (req, res) => {
@@ -47,6 +50,7 @@ router.post('/', async (req, res) => {
     member = req.body;
     username = req.body.username
 
+    memNo = req.body.membershipNo
     console.log(member.memberData.academic.length)
     // officialData = req.body.officialData;
     // professionalData = req.body.professionalData;
@@ -141,11 +145,11 @@ function addMember(res,id,member) {
     let enroll ;
     let applied ;
     if(memberData.enrollDate) {
-        enroll = new Date(memberData.enrollDate).toLocaleDateString() 
+        enroll = new Date(memberData.enrollDate).toISOString()
     }
     if(memberData.appliedDate){
         let today = new Date();
-        applied = new Date().toLocaleDateString()
+        applied = new Date().toISOString()
     }
     
     //*****************  memberDataFolioNo  needed ***********************
@@ -201,7 +205,8 @@ function addAcademic(id,res,member) {
                     
                 }
                     
-            });
+            }
+        );
 
     }   
             
@@ -209,15 +214,19 @@ function addAcademic(id,res,member) {
     console.log("Aca Saved")
     console.log("acc type", member.memberData.status)
     // res.status(200).send("Successfully Added Member " + memberFirstName)  
+    console.log("memmmmno", member.memberData.membershipNo)
+    sendEmail(member.memberData.email, member.membershipNo, member.memberData.section, member.memberData.status)
     if(member.memberData.status == "Applicant") {
         updateApplicant(id, res)
     }
     else {
+        
         res.status(200).json({
             msg: "Application Succesfully Submitted"
         })
         return
     }
+    
     
 }
 
@@ -241,6 +250,56 @@ function updateApplicant(id, res) {
         })    
 
     });
+    
+}
+
+let transporter = nodemailer.createTransport(nodemailMailGun(env.emailAuth));
+
+let mailContent={
+    from: 'slaasmembermanagement@gmail.com',
+    to: '',
+    subject: '',
+    text: '',
+    // html: '<h1>You can send html formatted content using Nodemailer with attachments</h1>',
+    // attachments: [
+    //     {
+    //         filename: 'image1.png',
+    //         path: appRoot + '/profilePics/image1.png'
+    //     }
+    // ]
+};
+
+function sendEmail(e, memNo, section, status) {
+
+    console.log("memno", memNo)
+
+    connection.query(`SELECT * FROM emailbodies WHERE type='Registration Success';`
+
+    , async function (error, results, fields) {
+        if (error) throw error;
+        let subject = results[0].subject
+        let body = results[0].body
+
+        let memNoAdded = body.replace("@memNo", `${memNo}/${section}`)
+
+        mailContent.to = e
+        mailContent.subject = subject
+        mailContent.text = memNoAdded
+
+        transporter.sendMail(mailContent, function(error, data){
+            if(error){
+
+                console.log(`Mail Failed`, error);
+                // res.status(404).send(`Registration Success Email Failed`)
+            }
+            else{
+                console.log(`Email send successfully`);
+                // res.status(200).send(`Email successfully`)
+                        
+            }
+        });
+    });
+
     
 }
 

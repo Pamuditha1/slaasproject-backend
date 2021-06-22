@@ -33,6 +33,21 @@ connection.connect((err) => {
     else console.log("Database connection failed" , send.stringify(err));   
 });
 
+router.get('/last-update', async (req, res) => {
+
+    connection.query(`SELECT date FROM remindermails ORDER BY id DESC LIMIT 1;`
+
+    , async function (error, results, fields) {
+
+        if (error) console.log(error);
+     
+        res.status(200).send(results[0].date);
+
+    });
+    
+    
+});
+
 router.get('/', async (req, res) => {
 
     getTerminationDates(res)
@@ -86,7 +101,7 @@ function getMembersOfSendingMails(res, datesToTerminate) {
                     if(diffDays > datesToTerminate) {
                     
                     //select last update diff < difference between today and last membership payment date diff
-                    if(diffDaysUpdated < diffDays) {
+                    if(diffDaysUpdated > diffDays) {
                         return true
                     }
                 }
@@ -124,41 +139,68 @@ function sendMailstoEmails(emails, res) {
     let failed = 0
     let success = 0
     let failedMails = []
-    emails.map((e) => {
 
-        mailContent.to = e.email;
 
-        transporter.sendMail(mailContent, function(error, data){
-            if(error){
-                failed++
-                i++
-                failedMails.push(e.email)
-                if(i==mailsCount) {
-                    console.log(`Unable to send mail to ${e.email}`, error);
-                    res.status(404).send(`Unable to send mail to ${e.email}`)
+    connection.query(`SELECT * FROM emailbodies WHERE type='Membership Payment Reminder';`
+
+    , async function (error, results, fields) {
+        if (error) {
+            console.log("Gettings Mail Data Error", error)
+            throw error
+        } ;
+
+        let subject = results[0].subject
+        let body = results[0].body
+
+        mailContent.subject = subject
+        mailContent.text = body
+
+        emails.map((e) => {
+
+            console.log(e)
+
+            mailContent.to = e.email;
+
+            transporter.sendMail(mailContent, function(error, data){
+                if(error){
+                    console.log("Sending Error", error)
+                    failed++
+                    i++
+                    failedMails.push(e.email)
+                    if(i==mailsCount) {
+                        console.log(`Unable to send mail to ${e.email}`, error);
+                        res.status(200).json({
+                            msg: `Emails successfully sent to ${success} emails`,
+                            failed: failedMails
+                        })
+                    }
+                    
                 }
-                
-            }
-            else{
-                success++
-                i++
-                setNewReminderDate(e.memberID)
-                if(i==mailsCount) {
-                    console.log(`Email send successfully to ${e.email}`);
-                    res.status(200).send(`Email successfully sent to ${success} mails`)
+                else{
+                    success++
+                    i++
+                    setNewReminderDate(e.id)
+                    if(i==mailsCount) {
+                        console.log(`Email send successfully to ${e.email}`);
+                        res.status(200).json({
+                            msg: `Emails successfully sent to ${success} emails`,
+                            failed: failedMails
+                        })
+                    }                
                 }
-                
-            }
-        });
+            });
         
-    })
+        })
+    });
 }
 
 
 function setNewReminderDate(memberID) {
 
+    let today = new Date().toISOString()
+
     connection.query(`UPDATE members
-    SET reminderMailDate='${new Date().toISOString()}' WHERE memberID='${memberID}';`, (error, results, fields) => {
+    SET reminderMailDate='${today}' WHERE memberID='${memberID}';`, (error, results, fields) => {
 
         if(error) {
             console.log(error)
