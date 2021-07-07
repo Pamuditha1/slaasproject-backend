@@ -46,6 +46,7 @@ const getOneApplication = require('./routes/getOneApplication')
 const updateApplication = require('./routes/updateApplication')
 const getMailSettingsData = require('./routes/emailSettingsData')
 const getApplicationStatus = require('./routes/getApplicationProgress')
+const calculateArrearsOne = require('./routes/calculateOneArrears')
 
 
 // if (!config.get('jwtPrivateKey')) {
@@ -100,6 +101,7 @@ app.use('/slaas/api/user/view-application', getOneApplication);
 app.use('/slaas/api/user/update-application', updateApplication);
 app.use('/slaas/api/user/mailsettings', getMailSettingsData);
 app.use('/slaas/api/user/application-progress', getApplicationStatus);
+app.use('/slaas/api/user/cal-arrears', calculateArrearsOne);
 app.use('/slaas/api/auth', auth);
 
 var connection = mysql.createConnection(envVariables.mysqlConnection);

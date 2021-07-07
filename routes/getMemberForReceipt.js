@@ -20,7 +20,7 @@ router.get('/:memNo', async (req, res) => {
 
     console.log("Sumery Came", req.params.memNo)
 
-    connection.query(`SELECT memberID, membershipNo, nameWinitials, nic, memPaidLast, lastPaidForYear, lastMembershipPaid, arrearsConti
+    connection.query(`SELECT memberID, membershipNo, nameWinitials, nic, memPaidLast, lastPaidForYear, lastMembershipPaid, arrearsConti, arrearsUpdated
     FROM members
     WHERE membershipNo = "${req.params.memNo}";`
 
