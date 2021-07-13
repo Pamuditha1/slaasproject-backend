@@ -148,6 +148,8 @@ router.post('/member', async (req, res) => {
         let alreadyReg = false;
         let passwordCorrect = false;
         let memberID = '';
+        let firstName = ''
+        let lastName = ''
         // console.log(results)
         for(i=0; i<results.length; i++) {
             if(req.body.membershipNo == results[i].membershipNo) {
@@ -157,6 +159,8 @@ router.post('/member', async (req, res) => {
                 if(passwordCorrect){
                     
                     memberID = results[i].memberID;
+                    // firstName = results[i].commonFirst
+                    // lastName = results[i].commomLast
                 }
                 break;
             }            
