@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
     console.log(req.params.section)
 
-    connection.query(`SELECT membershipNo FROM members ORDER BY enrollDate DESC LIMIT 1;`
+    connection.query(`SELECT membershipNo FROM members WHERE status="Member" ORDER BY enrollDate DESC LIMIT 1;`
 
     , async function (error, results, fields) {
         if (error) throw error;
