@@ -127,7 +127,7 @@ function addMember(res,id,member) {
 
     const memberData = member.memberData
 
-    const resAddrs = `${memberData.resAddOne}, ${memberData.resAddTwo }, ${memberData.resAddThree}, ${memberData.resAddFour}, ${memberData.resAddFive}` ;
+    const resAddrs = `${memberData.resAddOne}, ${memberData.resAddTwo}, ${memberData.resAddThree}, ${memberData.resAddFour}, ${memberData.resAddFive}` ;
     const perAddrs =   `${memberData.perAddOne}, ${memberData.perAddTwo} , ${memberData.perAddThree}, ${memberData.perAddFour}, ${memberData.perAddFive}`;
     const offAddrs =  `${memberData.offAddrslineOne}, ${memberData.offAddrslineTwo}, ${memberData.offAddrslineThree}, ${memberData.offAddrslineFour}, ${memberData.offAddrslineFive}`;
 
@@ -222,7 +222,7 @@ function addAcademic(id,res,member) {
     else {
         
         res.status(200).json({
-            msg: "Application Succesfully Submitted"
+            msg: "Member Successfully Registered"
         })
         return
     }
