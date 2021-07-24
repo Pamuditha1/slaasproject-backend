@@ -22,7 +22,8 @@ router.get('/', async (req, res) => {
     date, time, invoiceNo, nameWinitials, membershipNo, nic, total, yearOfPayment, type, admission, arrears, yearlyFee, idCardFee,
     description
     FROM payments, members
-    WHERE members.memberID = payments.memberID `
+    WHERE members.memberID = payments.memberID 
+    ORDER BY invoiceNo DESC`
 
     , async function (error, results, fields) {
         if (error) throw error;

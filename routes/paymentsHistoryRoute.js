@@ -21,7 +21,7 @@ router.get('/:memID', async (req, res) => {
     console.log("History Came", req.params.memID)
 
     connection.query(`SELECT * FROM payments
-    WHERE memberID = "${req.params.memID}";`
+    WHERE memberID = "${req.params.memID}" ORDER BY invoiceNo DESC;`
 
     , async function (error, results, fields) {
         if (error) console.log(error);

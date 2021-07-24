@@ -118,7 +118,7 @@ function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate) {
                     if(diffDays > datesToTerminate) {
                     
                     //select last update diff < difference between today and last membership payment date diff
-                    if(diffDaysUpdated < diffDays) {
+                    if(diffDaysUpdated > diffDays) {
                         return true
                     }
                 }

@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     title, nameWinitials, status, dot, lastPaidForYear, lastMembershipPaid, arrearsConti, memPaidLast, nic, mobileNo, email, resAddrs, gradeOfMembership, section, enrollDate, 
     councilPosition, memberFolioNo, membershipNo
     FROM 
-    members WHERE status="Terminated";`
+    members WHERE status="Terminated" ORDER BY dot DESC;`
 
     , async function (error, results, fields) {
         if (error) console.log(error);

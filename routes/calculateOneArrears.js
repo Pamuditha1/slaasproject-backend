@@ -18,8 +18,8 @@ connection.connect((err) => {
 
 router.get('/:id', async (req, res) => {
 
-    console.log('One Update Calculate', req.params)
-    getGrades(res)
+    console.log('One Update Calculate', req.params.id)
+    // getGrades(res)
     getTerminationDates(res, req.params.id)
 
 });
@@ -74,15 +74,16 @@ function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate, id)
     console.log(newOrString)
 
     connection.query(`SELECT memberID, lastPaidForYear, lastMembershipPaid, arrearsUpdated, gradeOfMembership, arrearsConti 
-    FROM members WHERE memberID=${id} AND ${newOrString};`
+    FROM members WHERE memberID='${id}' AND ${newOrString};`
 
     , async function (error, results, fields) {
 
         let today = new Date()
 
-        if (error) console.log(error);
-
+        if (error) console.log("Selece Mem Error", error);
+        console.log("Selected mem", results)
         //get outdated members according to last membership payment date (lastMembershipPaid) - more than 1 year
+        
         let outdatedMembers = results.filter((m) => {
 
             if(m.lastMembershipPaid) {
@@ -102,9 +103,10 @@ function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate, id)
                 //select last membershi payment > 1 year
                 // if(diffDays > 365) {
                     if(diffDays > datesToTerminate) {
-                    
+                    console.log('dif dates', diffDays)
                     //select last update diff < difference between today and last membership payment date diff
-                    if(diffDaysUpdated < diffDays) {
+                    if(diffDaysUpdated > diffDays) {
+                        console.log('dif dates updated', diffDays)
                         return true
                     }
                 }
@@ -112,6 +114,7 @@ function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate, id)
             }
             else false
         })
+        console.log("outdated member",outdatedMembers)
 
         // calculate arrears according to the last mambership paid for year (lastPaidForYear)
         outdatedMembers.forEach(m => {
@@ -138,12 +141,13 @@ function getMembersOfPayingGrades(grades, gradesWfee, res, datesToTerminate, id)
 }
 
 function setNewArrears(newArrears, memberID) {
-
+    console.log("new Arr", newArrears)
+    console.log("Mem Id", memberID)
     connection.query(`UPDATE members
     SET arrearsConti='${newArrears}', arrearsUpdated='${new Date().toISOString()}' WHERE memberID='${memberID}';`, (error, results, fields) => {
 
         if(error) {
-            console.log(error)
+            console.log("Set New Arrears Error",error)
             throw error
         }
         console.log("Arrears Updated")    
