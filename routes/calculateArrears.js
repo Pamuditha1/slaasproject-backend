@@ -178,7 +178,7 @@ function setNewArrears(newArrears, memberID) {
             console.log(error)
             throw error
         }
-        console.log("Arrears Updated")    
+        console.log("Arrears Updated", results)    
 
     });
 }
